@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(cors({
-  origin: 'https://tribus-chi.vercel.app/',
+  origin: 'https://tribus-chi.vercel.app',
   credentials: true
 }));
 
