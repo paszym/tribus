@@ -15,7 +15,7 @@ export function useStopsData() {
     const cachedData = localStorage.getItem(stopsKey)
     const lastUpdate = localStorage.getItem(lastUpdateKey)
 
-    if (lastUpdate && cachedData) {
+    if (lastUpdate && cachedData && cachedData !== 'null' && cachedData !== '') {
       const lastUpdateDate = new Date(lastUpdate).valueOf()
       const now = new Date().valueOf()
       const hoursSinceUpdate = (now - lastUpdateDate) / (1000 * 60 * 60)
@@ -40,7 +40,7 @@ export function useStopsData() {
       const { data, fetchData } = useApi(`${API}/ztm/stops`)
       await fetchData()
 
-      if (data.value) {
+      if (data.value && data.value.length > 0) {
         stopsData.value = data.value.map((stop) => ({
           lat: stop.stopLat,
           lon: stop.stopLon,
