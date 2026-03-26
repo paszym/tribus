@@ -158,7 +158,7 @@ export default {
     async fetchDepartures(stopId) {
       try {
         const response = await this.fetchDataFromAPI(
-          'http://${API}/ztm/departures?stopId=' + stopId,
+          `${API}/ztm/departures?stopId=` + stopId,
         )
         this.rawData = response
         let departures = []
