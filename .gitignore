@@ -1,0 +1,29 @@
+# Zależności
+vue-frontend/node_modules/
+express-backend/node_modules/
+
+# Buildy
+vue-frontend/dist/
+
+# Zmienne środowiskowe - NIGDY nie wrzucamy na GitHub
+vue-frontend/.env
+express-backend/.env
+express-backend/.env.local
+
+# Logi
+*.log
+npm-debug.log*
+
+# System
+.DS_Store
+Thumbs.db
+
+# Lokalna instalacja MongoDB
+express-backend/mongodb-windows-x86_64-8.0.4/
+
+# Pliki tymczasowe Vite
+vue-frontend/vite.config.ts.timestamp-*
+vue-frontend/vitest.config.ts.timestamp-*
+
+# Wyniki testów
+vue-frontend/tests_output/
