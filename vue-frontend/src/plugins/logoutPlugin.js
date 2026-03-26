@@ -1,11 +1,12 @@
 import { useToast } from 'vue-toast-notification'
+const API = import.meta.env.VITE_API_BASE_URL
 
 export default {
   install(app) {
     const toast = useToast()
     app.config.globalProperties.$logout = async function () {
       try {
-        const response = await fetch('http://localhost:3000/users/logout', {
+        const response = await fetch(`${API}/users/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -1,19 +1,19 @@
 describe('API works correctly', () => {
   // ZTM
   it('ZTM: Vehicle positions', () => {
-    const reqUrl = 'http://localhost:3000/ztm/positions'
+    const reqUrl = 'http://${API}/ztm/positions'
     cy.request('GET', reqUrl).then((response) => {
       expect(response.status).to.eq(200)
     })
   })
   it('ZTM: Stop departures', () => {
-    const reqUrl = 'http://localhost:3000/ztm/departures?stopId=1000'
+    const reqUrl = 'http://${API}/ztm/departures?stopId=1000'
     cy.request('GET', reqUrl).then((response) => {
       expect(response.status).to.eq(200)
     })
   })
   it('ZTM: Stops positions', () => {
-    const reqUrl = 'http://localhost:3000/ztm/stops'
+    const reqUrl = 'http://${API}/ztm/stops'
     cy.request('GET', reqUrl).then((response) => {
       expect(response.status).to.eq(200)
     })
@@ -25,7 +25,7 @@ describe('API works correctly', () => {
   }
 
   it('users: correct data: login user', () => {
-    const reqUrl = 'http://localhost:3000/users/login'
+    const reqUrl = 'http://${API}/users/login'
 
     cy.request({
       method: 'POST',
@@ -39,8 +39,8 @@ describe('API works correctly', () => {
     })
   })
   it('users: refresh token data', () => {
-    const loginUrl = 'http://localhost:3000/users/login'
-    const refreshUrl = 'http://localhost:3000/users/refresh'
+    const loginUrl = 'http://${API}/users/login'
+    const refreshUrl = 'http://${API}/users/refresh'
 
     cy.request({
       method: 'POST',
@@ -67,8 +67,8 @@ describe('API works correctly', () => {
     })
   })
   it('users: logout user', () => {
-    const loginUrl = 'http://localhost:3000/users/login'
-    const logoutUrl = 'http://localhost:3000/users/logout'
+    const loginUrl = 'http://${API}/users/login'
+    const logoutUrl = 'http://${API}/users/logout'
 
     cy.request({
       method: 'POST',

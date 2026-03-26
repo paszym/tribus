@@ -8,7 +8,7 @@ describe('Stop popup works correctly', () => {
       bubbles: true,
     })
 
-    const reqUrl = 'http://localhost:3000/ztm/departures?stopId=' + 2000
+    const reqUrl = 'http://${API}/ztm/departures?stopId=' + 2000
 
     cy.request('GET', reqUrl).then((response) => {
       expect(response.status).to.eq(200)

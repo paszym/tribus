@@ -2,7 +2,7 @@ describe('Vehicle popup works correctly', () => {
   it('vehicle popup opens and shows correct data', () => {
     let routeId: string = ''
     cy.visit('http://localhost:5173')
-    const reqUrl = 'http://localhost:3000/ztm/positions'
+    const reqUrl = 'http://${API}/ztm/positions'
     cy.request('GET', reqUrl).then((response) => {
       expect(response.status).to.eq(200)
     })

@@ -4,6 +4,8 @@ import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
 export function useStopsData() {
+  const API = import.meta.env.VITE_API_BASE_URL
+
   const stopsData = ref([])
 
   async function getData() {
@@ -35,7 +37,7 @@ export function useStopsData() {
     }
 
     try {
-      const { data, fetchData } = useApi('http://localhost:3000/ztm/stops')
+      const { data, fetchData } = useApi(`${API}/ztm/stops`)
       await fetchData()
 
       if (data.value) {

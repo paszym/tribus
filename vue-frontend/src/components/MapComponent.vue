@@ -3,18 +3,16 @@
     <div class="absolute top-2.5 right-2.5 bg-white/80 p-2.5 rounded font-bold text-sm z-[1000]">
       {{ updateCountdown === 5 ? 'Aktualizuję...' : `Aktualizacja za: ${updateCountdown} sekund` }}
     </div>
-    <div
-      v-if="isUserLogged"
-      class="absolute top-20 right-2.5 bg-white/80 p-2.5 rounded font-bold text-sm z-[1000] space-y-2 flex flex-col"
-    >
+    <div v-if="isUserLogged"
+      class="absolute top-20 right-2.5 bg-white/80 p-2.5 rounded font-bold text-sm z-[1000] space-y-2 flex flex-col">
       <p>Filtry ulubionych: <br /></p>
 
       <!-- Toggle 1 -->
       <label class="inline-flex items-center cursor-pointer">
         <input type="checkbox" v-model="onlyStops" value="" class="sr-only peer" />
         <div
-          class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-        ></div>
+          class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+        </div>
         <span class="ms-3 text-sm font-bold text-black-900">Tylko przystanki</span>
       </label>
 
@@ -22,8 +20,8 @@
       <label class="inline-flex items-center cursor-pointer">
         <input type="checkbox" v-model="onlyLines" value="" class="sr-only peer" />
         <div
-          class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-        ></div>
+          class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+        </div>
         <span class="ms-3 text-sm font-bold text-black-900">Tylko linie</span>
       </label>
 
@@ -31,8 +29,8 @@
       <label class="inline-flex items-center cursor-pointer">
         <input type="checkbox" v-model="onlyVehicles" value="" class="sr-only peer" />
         <div
-          class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-        ></div>
+          class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+        </div>
         <span class="ms-3 text-sm font-bold text-black-900">Tylko pojazdy</span>
       </label>
     </div>
@@ -47,6 +45,7 @@ import StopPopup from './StopPopup.vue'
 import VehiclePopup from './VehiclePopup.vue'
 import { useApi } from './../composables/useApi..js'
 import { useFavouritesStore } from './../store/favouritesStore.js'
+const API = import.meta.env.VITE_API_BASE_URL;
 
 const stopIcon = L.divIcon({
   className: 'berlin-marker', // Custom class name for the icon
@@ -163,7 +162,7 @@ export default {
       let refreshResponse
       try {
         const refreshToken = localStorage.getItem('refreshToken')
-        refreshResponse = await fetch('http://localhost:3000/users/refresh', {
+        refreshResponse = await fetch(`${API}/users/refresh`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -186,11 +185,12 @@ export default {
       }
     },
     async fetchFavourites() {
+
       const loggedIn = sessionStorage.getItem('loggedIn')
       if (loggedIn) {
         const authToken = localStorage.getItem('authToken')
         try {
-          let response = await fetch('http://localhost:3000/users/user/favourites', {
+          let response = await fetch(`${API}/users/user/favourites`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ export default {
             await this.fetchRefresh()
             const authToken = localStorage.getItem('authToken')
 
-            response = await fetch('http://localhost:3000/users/user/favourites', {
+            response = await fetch(`${API}/users/user/favourites`, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
@@ -303,7 +303,7 @@ export default {
       const favouritesStore = useFavouritesStore()
       try {
         const authToken = localStorage.getItem('authToken')
-        const response = await fetch('http://localhost:3000/users/user/favourites', {
+        const response = await fetch(`${API}/users/user/favourites`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -318,7 +318,7 @@ export default {
           this.$toast.info('Odświeżanie tokena', { duration: 3000 })
           await this.fetchRefresh()
           const authToken = localStorage.getItem('authToken')
-          const response = await fetch('http://localhost:3000/users/user/favourites', {
+          const response = await fetch(`${API}/users/user/favourites`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -488,8 +488,8 @@ export default {
     initializeMap() {
       this.map = L.map('mapContainer').setView([54.352025, 18.646638], 13)
 
-      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(this.map)
     },
 
@@ -503,7 +503,7 @@ export default {
     },
     async getStopDepartures(stopId) {
       try {
-        const { data, fetchData } = useApi('http://localhost:3000/ztm/departures?stopId=' + stopId)
+        const { data, fetchData } = useApi(`${API}/ztm/departures?stopId=` + stopId)
         await fetchData()
 
         this.rawData = data
@@ -517,7 +517,7 @@ export default {
           }))
           return departures
         }
-      } catch {}
+      } catch { }
     },
     async getStopsData() {
       const stops = 'stops'
@@ -553,7 +553,7 @@ export default {
       }
 
       try {
-        const { data, fetchData } = useApi('http://localhost:3000/ztm/stops')
+        const { data, fetchData } = useApi(`${API}/ztm/stops`)
         await fetchData()
         this.stopsRawData = data
         try {
@@ -585,7 +585,7 @@ export default {
       await this.getStopsData()
     },
     async parseVechiclesData() {
-      const { data, fetchData } = useApi('http://localhost:3000/ztm/positions')
+      const { data, fetchData } = useApi(`${API}/ztm/positions`)
       await fetchData()
       try {
         this.rawData = data

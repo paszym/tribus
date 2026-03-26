@@ -5,12 +5,7 @@
       <!-- Search bar -->
       <div class="mb-4">
         <h3 class="text-lg font-bold mb-2">Wyszukiwarka przystanków:</h3>
-        <input
-          type="text"
-          v-model="searchQuery"
-          class="w-full p-2 border rounded"
-          placeholder="Wyszukaj przystanek"
-        />
+        <input type="text" v-model="searchQuery" class="w-full p-2 border rounded" placeholder="Wyszukaj przystanek" />
       </div>
 
       <!-- Search results -->
@@ -35,33 +30,20 @@
                 <span>{{ stop.name }} ({{ stop.code }})</span>
               </td>
               <td class="py-2 px-1 text-right w-1/4">
-                <button
-                  v-if="stop.id !== currentStopId"
-                  @click="fetchDepartures(stop.id)"
-                  class="bg-blue-500 text-white px-3 py-1 rounded"
-                >
+                <button v-if="stop.id !== currentStopId" @click="fetchDepartures(stop.id)"
+                  class="bg-blue-500 text-white px-3 py-1 rounded">
                   Pokaż odjazdy
                 </button>
-                <button
-                  v-else
-                  class="text-blue-500 font-bold bg-white px-2 rounded border-x-8 border-blue-500"
-                >
+                <button v-else class="text-blue-500 font-bold bg-white px-2 rounded border-x-8 border-blue-500">
                   Odjazdy >>
                 </button>
               </td>
               <td v-if="isUserLogged" class="py-2 px-1 text-left w-1/4">
-                <button
-                  v-if="this.isFavourite(stop)"
-                  @click="toggleFavourite(stop.id)"
-                  class="bg-red-500 text-white px-3 py-1 rounded"
-                >
+                <button v-if="this.isFavourite(stop)" @click="toggleFavourite(stop.id)"
+                  class="bg-red-500 text-white px-3 py-1 rounded">
                   Usuń
                 </button>
-                <button
-                  v-else
-                  @click="toggleFavourite(stop.id)"
-                  class="bg-green-700 text-white px-3 py-1 rounded"
-                >
+                <button v-else @click="toggleFavourite(stop.id)" class="bg-green-700 text-white px-3 py-1 rounded">
                   Dodaj
                 </button>
               </td>
@@ -96,33 +78,20 @@
                   <span>{{ stop.name }} ({{ stop.code }})</span>
                 </td>
                 <td class="py-2 px-1 text-right w-1/4">
-                  <button
-                    v-if="stop.id !== currentStopId"
-                    @click="fetchDepartures(stop.id)"
-                    class="bg-blue-500 text-white px-3 py-1 rounded"
-                  >
+                  <button v-if="stop.id !== currentStopId" @click="fetchDepartures(stop.id)"
+                    class="bg-blue-500 text-white px-3 py-1 rounded">
                     Pokaż odjazdy
                   </button>
-                  <button
-                    v-else
-                    class="text-blue-500 font-bold bg-white px-2 rounded border-x-8 border-blue-500"
-                  >
+                  <button v-else class="text-blue-500 font-bold bg-white px-2 rounded border-x-8 border-blue-500">
                     Odjazdy >>
                   </button>
                 </td>
                 <td class="py-2 px-1 text-left w-1/4">
-                  <button
-                    v-if="this.isFavourite(stop)"
-                    @click="toggleFavourite(stop.id)"
-                    class="bg-red-500 text-white px-3 py-1 rounded"
-                  >
+                  <button v-if="this.isFavourite(stop)" @click="toggleFavourite(stop.id)"
+                    class="bg-red-500 text-white px-3 py-1 rounded">
                     Usuń
                   </button>
-                  <button
-                    v-else
-                    @click="toggleFavourite(stop.id)"
-                    class="bg-green-700 text-white px-3 py-1 rounded"
-                  >
+                  <button v-else @click="toggleFavourite(stop.id)" class="bg-green-700 text-white px-3 py-1 rounded">
                     Dodaj
                   </button>
                 </td>
@@ -147,6 +116,7 @@ import axios from 'axios'
 import DeparturesTable from './DeparturesTable.vue'
 import { useFavouritesStore } from './../store/favouritesStore.js'
 import { useApi } from './../composables/useApi..js'
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default {
   components: {
@@ -188,7 +158,7 @@ export default {
     async fetchDepartures(stopId) {
       try {
         const response = await this.fetchDataFromAPI(
-          'http://localhost:3000/ztm/departures?stopId=' + stopId,
+          'http://${API}/ztm/departures?stopId=' + stopId,
         )
         this.rawData = response
         let departures = []
@@ -244,7 +214,7 @@ export default {
         }
       }
       try {
-        const { data, fetchData } = useApi('http://localhost:3000/ztm/stops')
+        const { data, fetchData } = useApi(`${API}/ztm/stops`)
         await fetchData()
         this.stopsRawData = data
         try {
@@ -277,7 +247,7 @@ export default {
       let refreshResponse
       try {
         const refreshToken = localStorage.getItem('refreshToken')
-        refreshResponse = await fetch('http://localhost:3000/users/refresh', {
+        refreshResponse = await fetch(`${API}/users/refresh`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -304,7 +274,7 @@ export default {
       if (loggedIn) {
         const authToken = localStorage.getItem('authToken')
         try {
-          let response = await fetch('http://localhost:3000/users/user/favourites', {
+          let response = await fetch(`/${API}/users/user/favourites`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -328,7 +298,7 @@ export default {
             await this.fetchRefresh()
             const authToken = localStorage.getItem('authToken')
 
-            response = await fetch('http://localhost:3000/users/user/favourites', {
+            response = await fetch(`${API}/users/user/favourites`, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
@@ -359,7 +329,7 @@ export default {
       const favouritesStore = useFavouritesStore()
       try {
         const authToken = localStorage.getItem('authToken')
-        const response = await fetch('http://localhost:3000/users/user/favourites', {
+        const response = await fetch(`${API}/users/user/favourites`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -374,7 +344,7 @@ export default {
           this.$toast.info('Odświeżanie tokena', { duration: 3000 })
           await this.fetchRefresh()
           const authToken = localStorage.getItem('authToken')
-          const response = await fetch('http://localhost:3000/users/user/favourites', {
+          const response = await fetch(`${API}/users/user/favourites`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
