@@ -11,7 +11,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://tribus-chi.vercel.app/',
+  credentials: true
+}));
 
 app.use("/users", userRoutes);
 app.use("/ztm", ztmRoutes);
