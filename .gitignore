@@ -9,6 +9,7 @@ vue-frontend/dist/
 vue-frontend/.env
 express-backend/.env
 express-backend/.env.local
+express-backend/.env.*
 
 # Logi
 *.log
