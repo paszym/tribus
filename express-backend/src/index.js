@@ -34,7 +34,52 @@ app.use("/users", userRoutes);
 app.use("/ztm", ztmRoutes);
 
 app.get("/", (req, res) => {
-  res.send("API users + ztm");
+  const url = isDev ? `http://localhost:${PORT}` : SERVER_URL;
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="pl">
+    <head>
+      <meta charset="UTF-8">
+      <title>TriBus API</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f9f9f9;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          text-align: center;
+        }
+        h1 {
+          color: #333;
+        }
+        a {
+          color: #0070f3;
+          text-decoration: none;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+        .container {
+          padding: 2rem;
+          border: 1px solid #eee;
+          border-radius: 8px;
+          background-color: #fff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>TriBus API</h1>
+        <p>Swagger dostępny pod <br> <a href="${url}/api-docs" target="_blank">${url}/api-docs</a></p>
+      </div>
+    </body>
+    </html>
+  `);
 });
 
 // Swagger
@@ -44,11 +89,11 @@ const swaggerOptions = {
     info: {
       title: "TRIBUS API",
       version: "1.1.0",
-      description: "API bazuje na publicznym API ZTM oraz mongodb",
+      description: "API bazuje na publicznym API ZTM oraz bazie danych MongoDB",
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`,
+        url: isDev ? `http://localhost:${PORT}` : `${SERVER_URL}:${PORT}`
       },
     ],
     components: {
@@ -77,6 +122,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Serwer działa na http://localhost:${PORT}`);
-  console.log(`Swagger dostępny pod http://localhost:${PORT}/api-docs`);
+  const url = isDev ? `http://localhost:${PORT}` : SERVER_URL;
+  console.log(`Serwer działa na ${url}`);
+  console.log(`Swagger dostępny pod ${url}/api-docs`);
 });
