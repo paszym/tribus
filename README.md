@@ -12,8 +12,8 @@
 
 ```
 tribus/
-├─ vue-frontend/      # Frontend: Vue 3 + Leaflet + TailwindCSS
-├─ express-backend/   # Backend: Node.js / Express + JWT
+├─ vue-frontend/
+├─ express-backend/
 └─ README.md
 
 ```
@@ -72,3 +72,7 @@ Adresy backendu konfiguruje się przez zmienne środowiskowe w `.env`
 ## Uwagi
 
 Backend działa na darmowym planie Render — po okresie bezczynności może potrzebować kilku sekund na pierwsze uruchomienie.
+
+----------
+
+## Projekt w trakcie rozwoju...
