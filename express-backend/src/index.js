@@ -75,7 +75,7 @@ app.get("/", (req, res) => {
     <body>
       <div class="container">
         <h1>TriBus API</h1>
-        <p>Swagger dostępny pod <br> <a href="${url}/api-docs" target="_blank">${url}/api-docs</a></p>
+        <p>Swagger dostępny pod <br> <a href="/api-docs" target="_blank">/api-docs</a></p>
       </div>
     </body>
     </html>
