@@ -87,7 +87,7 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "TRIBUS API",
+      title: "TriBus API",
       version: "1.1.0",
       description: "API bazuje na publicznym API ZTM oraz bazie danych MongoDB",
     },
