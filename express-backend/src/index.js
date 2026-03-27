@@ -6,13 +6,27 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 const userRoutes = require("./interface/routes/userRoutes");
 const ztmRoutes = require("./interface/routes/ztmRoutes");
-
+const isDev = process.env.NODE_ENV !== 'production';
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SERVER_URL = process.env.BASE_URL;
 
 app.use(bodyParser.json());
+
+const allowedOrigins = isDev
+  ? ['http://localhost:5173']
+  : ['https://tribus-chi.vercel.app'];
+
 app.use(cors({
-  origin: 'https://tribus-chi.vercel.app',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS blocked'));
+    }
+  },
   credentials: true
 }));
 
@@ -23,14 +37,14 @@ app.get("/", (req, res) => {
   res.send("API users + ztm");
 });
 
-// Swagger konfiguracja
+// Swagger
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "RAI API",
-      version: "1.0.0",
-      description: "API bazuje na danych z bazy danych oraz z publicznego API ZTM",
+      title: "TRIBUS API",
+      version: "1.1.0",
+      description: "API bazuje na publicznym API ZTM oraz mongodb",
     },
     servers: [
       {
@@ -50,7 +64,7 @@ const swaggerOptions = {
   apis: ["src/interface/routes/*.js"], // Ścieżki do plików z opisem endpointów
 };
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions); // Używamy swaggerJsDoc do generacji dokumentacji
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use((req, res, next) => {
