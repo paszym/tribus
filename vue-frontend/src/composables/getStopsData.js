@@ -15,7 +15,13 @@ export function useStopsData() {
     const cachedData = localStorage.getItem(stopsKey)
     const lastUpdate = localStorage.getItem(lastUpdateKey)
 
-    if (lastUpdate && cachedData && cachedData !== 'null' && cachedData !== '') {
+    if (
+      lastUpdate &&
+      cachedData &&
+      cachedData !== 'null' &&
+      cachedData !== '' &&
+      cachedData.length > 0
+    ) {
       const lastUpdateDate = new Date(lastUpdate).valueOf()
       const now = new Date().valueOf()
       const hoursSinceUpdate = (now - lastUpdateDate) / (1000 * 60 * 60)

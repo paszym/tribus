@@ -188,7 +188,7 @@ export default {
       const cachedData = localStorage.getItem(stops)
       const lastUpdate = localStorage.getItem(lastUpdateKey)
 
-      if (lastUpdate && cachedData) {
+      if (lastUpdate && cachedData && cachedData.length > 0) {
         const lastUpdateDate = new Date(lastUpdate).valueOf()
         const now = new Date().valueOf()
 
