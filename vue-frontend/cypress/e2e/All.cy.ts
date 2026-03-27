@@ -16,7 +16,7 @@ describe('Map and stops lists working', () => {
   it('Logged in user can add to favourite on map', () => {
     cy.visit('http://localhost:5173')
     cy.get('a[href="/login"].rounded-md').should('be.visible').click()
-    fillLoginFormAndSubmit('mail.459841@gmail.com', 'chuj')
+    fillLoginFormAndSubmit('mail.459841@gmail.com', 'ccc')
 
     let stop: string = ''
     let initialFavoritesCount: number = 0
@@ -79,7 +79,7 @@ describe('Map and stops lists working', () => {
     cy.xpath('/html/body/div[5]').should('contain', 'Błąd podczas rejestracji')
 
     cy.get('a[href="/login"].rounded-md').should('be.visible').click()
-    fillLoginFormAndSubmit('mail.459841@gmail.com', 'chuj')
+    fillLoginFormAndSubmit('mail.459841@gmail.com', 'ccc')
     cy.xpath('//*[@id="app"]/nav/div/div/div/div[2]/div/p').should(
       'contain',
       'Zalogowany użytkownik:',
