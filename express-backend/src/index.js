@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 const allowedOrigins = isDev
   ? ['http://localhost:5173']
-  : ['https://tribus-chi.vercel.app'];
+  : ['https://tribus-alpha.vercel.app'];
 
 app.use(cors({
   origin: function (origin, callback) {
