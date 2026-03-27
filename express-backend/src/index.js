@@ -93,7 +93,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: isDev ? `http://localhost:${PORT}` : `${SERVER_URL}:${PORT}`
+        url: isDev ? `http://localhost:${PORT}` : `${SERVER_URL}`
       },
     ],
     components: {
