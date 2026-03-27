@@ -4,7 +4,7 @@
 
 # TriBus
 
-**TriBus** to fullstackowa aplikacja prezentująca dane transportu miejskiego — przystanki, linie i pozycje autobusów w czasie rzeczywistym. Projekt integruje publiczne API ZTM z własnym backendem Node.js/Express i pokazuje pełny flow: frontend → backend → autoryzacja → testy → deploy.
+**TriBus** to fullstackowa aplikacja prezentująca dane pochodzące z Zarządu Transportu Miejskiego w Gdańsku  — przystanki, linie i pozycje autobusów w czasie rzeczywistym. Projekt integruje publiczne API ZTM z własnym backendem Node.js/Express i pokazuje pełny flow: frontend → backend → autoryzacja → testy → deploy.
 
 ----------
 
