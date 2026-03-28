@@ -133,55 +133,6 @@ router.post("/user/favourites", (req, res) => {
 
     /**
      * @swagger
-     * /users/:
-     *   get:
-     *     summary: Pobierz listę wszystkich użytkowników
-     *     tags: [Users]
-     *     responses:
-     *       200:
-     *         description: Sukces - zwrócona lista użytkowników
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: array
-     *               items:
-     *                 type: object
-     *                 properties:
-     *                   id:
-     *                     type: string
-     *                   username:
-     *                     type: string
-     *       400:
-     *         description: Wystąpił błąd podczas pobierania danych
-     */
-    router.get("/", (req, res) => {
-      userController.getUsers(req, res);
-    });
-
-    /**
-     * @swagger
-     * /users/tokens:
-     *   get:
-     *     summary: Pobierz tokeny użytkownika
-     *     tags: [Users]
-     *     responses:
-     *       200:
-     *         description: Sukces - zwrócone tokeny użytkownika
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: array
-     *               items:
-     *                 type: string
-     *       400:
-     *         description: Wystąpił błąd podczas pobierania tokenów
-     */
-    router.get("/tokens", (req, res) => {
-      userController.getTokens(req, res);
-    });
-
-    /**
-     * @swagger
      * /users/login:
      *   post:
      *     summary: Zaloguj użytkownika
