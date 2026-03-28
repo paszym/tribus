@@ -1,17 +1,27 @@
 const { MongoClient } = require("mongodb");
 
+let client;
+let db;
+
 async function connectDatabase() {
+  if (db) return db;
+
   try {
-    const client = new MongoClient("mongodb://localhost:27017", {});
+    client = new MongoClient(process.env.MONGO_URI);
+
     await client.connect();
-    const db = client.db("mydb");
-    console.log("Połączono z bazą danych mongodb://localhost:27017");
+    db = client.db();
+
+    console.log(
+      `MongoDB connected (${process.env.NODE_ENV})`
+    );
+
     return {
       users: db.collection("users"),
       tokens: db.collection("tokens"),
     };
   } catch (error) {
-    console.error("Failed to connect to MongoDB:", error.message);
+    console.error("MongoDB connection error:", error.message);
     throw error;
   }
 }
