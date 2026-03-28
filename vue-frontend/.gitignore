@@ -13,10 +13,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# env
-.env
-.env.*
-
 # test output
 coverage/
 /cypress/videos/

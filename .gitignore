@@ -6,9 +6,11 @@ vue-frontend/dist/
 
 vue-frontend/.env
 vue-frontend/.env.*
+vue-frontend/!.env.example
+
 express-backend/.env
-express-backend/.env.local
 express-backend/.env.*
+express-backend/!.env.example
 
 *.log
 npm-debug.log*
