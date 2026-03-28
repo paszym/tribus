@@ -1,6 +1,4 @@
 const CreateUser = require("../../use-cases/CreateUser");
-const GetUsers = require("../../use-cases/GetUsers");
-const GetTokens = require("../../use-cases/GetTokens");
 const GetUser = require("../../use-cases/GetUser");
 const SetUserData = require("../../use-cases/SetUserData");
 const LoginUser = require("../../use-cases/LoginUser");
