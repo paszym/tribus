@@ -1,9 +1,11 @@
 vue-frontend/node_modules/
 express-backend/node_modules/
+database/
 
 vue-frontend/dist/
 
 vue-frontend/.env
+vue-frontend/.env.*
 express-backend/.env
 express-backend/.env.local
 express-backend/.env.*
