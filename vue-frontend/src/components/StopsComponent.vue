@@ -1,53 +1,28 @@
 <template>
-  <!-- Mapa w tle — zawsze widoczna -->
   <div class="stops-view">
     <div id="bg-map" class="bg-map"></div>
 
-    <!-- Floating search bar — pill jak navbar -->
     <div class="search-wrapper">
       <div class="search-pill">
-        <svg
-          class="search-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.35-4.35" />
         </svg>
-        <input
-          v-model="searchQuery"
-          class="search-input"
-          placeholder="Wyszukaj przystanek..."
-          @input="onSearch"
-          @focus="showResults = true"
-          autocomplete="off"
-          spellcheck="false"
-        />
+        <input v-model="searchQuery" class="search-input" placeholder="Wyszukaj przystanek..." @input="onSearch"
+          @focus="showResults = true" autocomplete="off" spellcheck="false" />
         <span v-if="searchQuery" class="search-clear" @click="clearSearch">✕</span>
       </div>
 
       <!-- Dropdown wyników -->
       <div v-if="showResults && filteredStops.length" class="results-dropdown">
-        <div
-          v-for="stop in filteredStops.slice(0, 8)"
-          :key="stop.id"
-          class="result-row"
-          :class="{ active: stop.id === currentStopId }"
-          @click="selectStop(stop)"
-        >
+        <div v-for="stop in filteredStops.slice(0, 10)" :key="stop.id" class="result-row"
+          :class="{ active: stop.id === currentStopId }" @click="selectStop(stop)">
           <div class="result-left">
             <span class="result-name">{{ stop.name }}</span>
             <span class="result-code">{{ stop.code }}</span>
           </div>
-          <button
-            v-if="isUserLogged"
-            class="fav-btn"
-            :class="{ starred: isFavourite(stop) }"
-            @click.stop="toggleFavourite(stop.id)"
-            title="Dodaj do ulubionych"
-          >
+          <button v-if="isUserLogged" class="fav-btn" :class="{ starred: isFavourite(stop) }"
+            @click.stop="toggleFavourite(stop.id)" title="Dodaj do ulubionych">
             {{ isFavourite(stop) ? '★' : '☆' }}
           </button>
         </div>
@@ -56,13 +31,8 @@
       <!-- Ulubione (gdy brak wyszukiwania i zalogowany) -->
       <div v-if="isUserLogged && !searchQuery && favouriteStops.length" class="results-dropdown">
         <p class="dropdown-label">Ulubione przystanki</p>
-        <div
-          v-for="stop in favouriteStops"
-          :key="stop.id"
-          class="result-row"
-          :class="{ active: stop.id === currentStopId }"
-          @click="selectStop(stop)"
-        >
+        <div v-for="stop in favouriteStops" :key="stop.id" class="result-row"
+          :class="{ active: stop.id === currentStopId }" @click="selectStop(stop)">
           <div class="result-left">
             <span class="result-name">{{ stop.name }}</span>
             <span class="result-code">{{ stop.code }}</span>
@@ -102,15 +72,15 @@
 
         <!-- Tabela odjazdów -->
         <div v-else class="dep-list">
-          <div v-for="(dep, i) in departuresData.slice(0, 8)" :key="i" class="dep-row">
+          <div v-for="(dep, i) in departuresData.slice(0, 15)" :key="i" class="dep-row">
             <span class="dep-time">{{ dep.estimatedTime }}</span>
             <span class="dep-badge" :class="dep.routeId < 2000 ? 'tram' : 'bus'">
               {{ dep.routeId }}
             </span>
             <span class="dep-headsign">{{ dep.headsign }}</span>
           </div>
-          <p v-if="departuresData.length > 8" class="dep-more">
-            + {{ departuresData.length - 8 }} kolejnych odjazdów
+          <p v-if="departuresData.length > 15" class="dep-more">
+            + {{ departuresData.length - 15 }} kolejnych odjazdów
           </p>
         </div>
       </div>
@@ -527,6 +497,7 @@ export default {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 2;
 }
 
 .dropdown-label {
@@ -612,7 +583,7 @@ export default {
   top: 20%;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 1;
   width: 40%;
   background: rgba(13, 15, 20, 0.92);
   backdrop-filter: blur(20px);
@@ -621,6 +592,7 @@ export default {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  width: min(520px, 90vw);
 }
 
 /* Animacja wjazdu */
@@ -729,6 +701,7 @@ export default {
 }
 
 @keyframes dot-bounce {
+
   0%,
   80%,
   100% {

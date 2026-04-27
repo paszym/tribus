@@ -117,6 +117,10 @@ body {
     0 4px 24px rgba(0, 0, 0, 0.4),
     0 1px 0 rgba(255, 255, 255, 0.05) inset;
   white-space: nowrap;
+
+  max-width: 95vw;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Brand */
@@ -210,6 +214,7 @@ body {
 }
 
 @keyframes dot-pulse {
+
   0%,
   100% {
     box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25);
