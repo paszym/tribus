@@ -1,4 +1,9 @@
+<script setup lang="ts">
+import { Analytics } from '@vercel/analytics/vue'
+</script>
+
 <template>
+  <Analytics />
   <div style="width: 100%; height: 100vh; display: flex; flex-direction: column">
     <!-- Floating pill navbar — unosi się nad mapą -->
     <div class="nav-wrapper">
