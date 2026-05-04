@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils'
-import StopsComponent from './../../components/StopsComponent.vue'
-import { useFavouritesStore } from './../../store/favouritesStore'
+import StopsComponent from '@/components/StopsComponent.vue'
+import { useFavouritesStore } from '@/store/favouritesStore'
 
 // Mockowanie store
-jest.mock('./../../store/favouritesStore.js', () => ({
+jest.mock('@store/favouritesStore', () => ({
   useFavouritesStore: jest.fn(),
 }))
 
@@ -52,12 +52,16 @@ describe('StopsComponent', () => {
   // Test: Filtrowanie przystanków
   it('filtrowanie przystanków na podstawie zapytania', async () => {
     await wrapper.setData({ searchQuery: 'Stop 1' })
-    expect(wrapper.vm.filteredStops).toEqual([{ id: 1, name: 'Stop 1', code: '001' }])
+    expect(wrapper.vm.filteredStops).toEqual([
+      { id: 1, name: 'Stop 1', code: '001' },
+    ])
   })
 
   it('wyświetla komunikat, gdy brak wyników wyszukiwania', async () => {
     await wrapper.setData({ searchQuery: 'Nieistniejący' })
-    expect(wrapper.find('h4').text()).toBe('Nie znaleziono przystanków o podanej nazwie')
+    expect(wrapper.find('h4').text()).toBe(
+      'Nie znaleziono przystanków o podanej nazwie',
+    )
   })
 
   it('wywołuje fetchDepartures z odpowiednim ID', async () => {
@@ -67,6 +71,8 @@ describe('StopsComponent', () => {
   })
 
   it('wyświetla listę ulubionych przystanków', () => {
-    expect(wrapper.vm.favouriteStops).toEqual([{ id: 1, name: 'Stop 1', code: '001' }])
+    expect(wrapper.vm.favouriteStops).toEqual([
+      { id: 1, name: 'Stop 1', code: '001' },
+    ])
   })
 })

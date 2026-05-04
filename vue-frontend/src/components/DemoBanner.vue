@@ -3,9 +3,9 @@
     <div v-if="visible" class="demo-banner-overlay">
       <div class="demo-banner">
         <div class="banner-icon">
-          <span class="icon-ring"></span>
-          <span class="icon-ring ring-2"></span>
-          <span class="icon-ring ring-3"></span>
+          <span class="icon-ring" />
+          <span class="icon-ring ring-2" />
+          <span class="icon-ring ring-3" />
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -21,64 +21,66 @@
         <div class="banner-content">
           <p class="banner-title">Oczekiwanie na dane&hellip;</p>
           <p class="banner-sub">
-            Backend projektu hostowany jest bezpłatnie i po okresie nieaktywności wymaga chwili na
-            uruchomienie. Prosimy o cierpliwość&nbsp;—&nbsp;dane pojawią się automatycznie.
+            Backend projektu hostowany jest bezpłatnie i po okresie
+            nieaktywności wymaga chwili na uruchomienie. Prosimy o
+            cierpliwość&nbsp;—&nbsp;dane pojawią się automatycznie.
           </p>
           <div class="banner-progress">
-            <div class="progress-bar"></div>
+            <div class="progress-bar" />
           </div>
-          <p class="banner-hint">Zwykle zajmuje to około 15–30 sekund</p>
+          <p class="banner-hint">Zwykle zajmuje to około 15-30 sekund</p>
         </div>
 
-        <button class="banner-close" @click="visible = false" title="Zamknij">✕</button>
+        <button class="banner-close" title="Zamknij" @click="visible = false">
+          ✕
+        </button>
       </div>
     </div>
   </Transition>
 </template>
 
-<script lang="ts">
-const CHECK_DELAY_MS = 4000 // ile czekamy zanim sprawdzimy
-const RECHECK_MS = 3000 // jak często sprawdzamy ponownie
-const SELECTOR = '.leaflet-marker-icon.leaflet-zoom-animated.leaflet-interactive'
+<script setup lang="ts">
+import { ref, onBeforeUnmount, watch } from 'vue'
 
-export default {
-  name: 'DemoBanner',
-  data() {
-    return {
-      visible: false,
-      recheckTimer: null as ReturnType<typeof setInterval> | null,
+const props = defineProps<{
+  isLoading: boolean
+  hasError: boolean
+}>()
+
+const SHOW_AFTER_MS = 6000
+const visible = ref(false)
+let showTimer: ReturnType<typeof setTimeout> | null = null
+
+function clearTimer() {
+  if (showTimer) {
+    clearTimeout(showTimer)
+    showTimer = null
+  }
+}
+
+watch(
+  () => props.isLoading,
+  (loading) => {
+    if (loading) {
+      showTimer = setTimeout(() => {
+        if (props.isLoading || props.hasError) visible.value = true
+      }, SHOW_AFTER_MS)
+    } else {
+      clearTimer()
+      visible.value = false
     }
   },
-  mounted() {
-    // Poczekaj CHECK_DELAY_MS, potem sprawdź
-    setTimeout(() => {
-      if (this.noMarkers()) {
-        this.visible = true
-        // Co RECHECK_MS sprawdzaj czy markery już są — jeśli tak, schowaj
-        this.recheckTimer = setInterval(() => {
-          if (!this.noMarkers()) {
-            this.visible = false
-            this.stopRecheck()
-          }
-        }, RECHECK_MS)
-      }
-    }, CHECK_DELAY_MS)
+  { immediate: true },
+)
+
+watch(
+  () => props.hasError,
+  (error) => {
+    if (error) visible.value = true
   },
-  beforeUnmount() {
-    this.stopRecheck()
-  },
-  methods: {
-    noMarkers() {
-      return document.querySelectorAll(SELECTOR).length === 0
-    },
-    stopRecheck() {
-      if (this.recheckTimer) {
-        clearInterval(this.recheckTimer)
-        this.recheckTimer = null
-      }
-    },
-  },
-}
+)
+
+onBeforeUnmount(clearTimer)
 </script>
 
 <style scoped>

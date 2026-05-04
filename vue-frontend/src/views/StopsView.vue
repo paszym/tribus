@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StopsComponent from '../components/StopsComponent.vue'
+import StopsComponent from '@/components/StopsComponent.vue'
 </script>
 
 <template>

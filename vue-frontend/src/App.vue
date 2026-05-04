@@ -1,10 +1,8 @@
-<script setup lang="ts">
-import { Analytics } from '@vercel/analytics/vue'
-</script>
-
 <template>
   <Analytics />
-  <div style="width: 100%; height: 100vh; display: flex; flex-direction: column">
+  <div
+    style="width: 100%; height: 100vh; display: flex; flex-direction: column"
+  >
     <!-- Floating pill navbar — unosi się nad mapą -->
     <div class="nav-wrapper">
       <nav class="nav-pill">
@@ -13,28 +11,30 @@ import { Analytics } from '@vercel/analytics/vue'
           <span class="brand-name">TriBus</span>
         </div>
 
-        <div class="nav-divider"></div>
+        <div class="nav-divider" />
 
         <div class="nav-links">
-          <RouterLink to="/" class="nav-link" :class="{ active: $route.path === '/' }">
+          <RouterLink to="/" class="nav-link" exact-active-class="active">
             Mapa na żywo
           </RouterLink>
-          <RouterLink to="/stops" class="nav-link" :class="{ active: $route.path === '/stops' }">
+          <RouterLink to="/stops" class="nav-link" exact-active-class="active">
             Odjazdy z przystanku
           </RouterLink>
         </div>
 
-        <div class="nav-divider"></div>
+        <div class="nav-divider" />
 
         <div class="nav-right">
-          <template v-if="isUserLogged">
+          <template v-if="isLoggedIn">
             <span class="user-badge">
-              <span class="user-dot"></span>
-              {{ loggedInBanner }}
+              <span class="user-dot" />
+              {{ username }}
             </span>
-            <button class="nav-btn" @click="this.$logout()">Wyloguj</button>
+            <button class="nav-btn" @click="logout()">Wyloguj</button>
           </template>
-          <RouterLink v-else to="/login" class="nav-btn primary">Zaloguj się</RouterLink>
+          <RouterLink v-else to="/login" class="nav-btn primary">
+            Zaloguj się
+          </RouterLink>
         </div>
       </nav>
     </div>
@@ -44,42 +44,11 @@ import { Analytics } from '@vercel/analytics/vue'
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  directives: {
-    hoverStyle: {
-      beforeMount(el, binding) {
-        const orig = el.style.color
-        const origBg = el.style.backgroundColor
-        el.addEventListener('mouseenter', () => {
-          el.style.color = binding.value.textColor || 'white'
-          el.style.backgroundColor = binding.value.bgColor || 'gray'
-        })
-        el.addEventListener('mouseleave', () => {
-          el.style.color = orig
-          el.style.backgroundColor = origBg
-        })
-      },
-    },
-  },
-  data() {
-    return { isUserLogged: false }
-  },
-  computed: {
-    loggedInBanner() {
-      return sessionStorage.getItem('username')
-    },
-  },
-  methods: {
-    updateSessionFlag() {
-      this.isUserLogged = sessionStorage.getItem('loggedIn') === 'true'
-    },
-  },
-  async mounted() {
-    this.updateSessionFlag()
-    this.$router.afterEach(() => this.updateSessionFlag())
-  },
-}
+<script setup lang="ts">
+import { Analytics } from '@vercel/analytics/vue'
+import { useAuth } from '@/composables/useAuth'
+
+const { isLoggedIn, username, logout } = useAuth()
 </script>
 
 <style>
@@ -219,7 +188,6 @@ body {
 }
 
 @keyframes dot-pulse {
-
   0%,
   100% {
     box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25);
