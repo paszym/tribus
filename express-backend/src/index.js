@@ -17,8 +17,7 @@ const allowedOrigins = isDev
   ? ['http://localhost:5173']
   : ['https://tribus-alpha.vercel.app'];
 
-const previewRegex =
-  /^https:\/\/tribus-git-[a-zA-Z0-9\-]+-paszyms-projects\.vercel\.app\/?$/;
+const previewRegex = new RegExp(process.env.ALLOWED_ORIGIN_REGEX);
 
 app.use(cors({
   origin: function (origin, callback) {
