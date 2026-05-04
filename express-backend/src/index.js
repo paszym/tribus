@@ -17,15 +17,21 @@ const allowedOrigins = isDev
   ? ['http://localhost:5173']
   : ['https://tribus-alpha.vercel.app'];
 
+const previewRegex =
+  /^https:\/\/tribus-git-[a-zA-Z0-9\-]+-paszyms-projects\.vercel\.app\/?$/;
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS blocked'));
+    const isAllowedProd = allowedOrigins.includes(origin);
+    const isAllowedPreview = previewRegex.test(origin);
+
+    if (isAllowedProd || isAllowedPreview) {
+      return callback(null, true);
     }
+
+    return callback(new Error('CORS blocked'));
   },
   credentials: true
 }));
