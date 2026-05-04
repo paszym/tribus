@@ -8,7 +8,15 @@
         height="26"
         viewBox="0 0 602 752"
       >
-        <rect x="1" y="1" width="600" height="750" rx="30" ry="30" fill="#0d0f14" />
+        <rect
+          x="1"
+          y="1"
+          width="600"
+          height="750"
+          rx="30"
+          ry="30"
+          fill="#0d0f14"
+        />
         <rect
           x=".5"
           y=".5"
@@ -19,8 +27,24 @@
           fill="none"
           stroke="rgba(184,134,11,0.4)"
         />
-        <rect x="7" y="7" width="588" height="738" rx="24" ry="24" fill="#b8860b" opacity="0.15" />
-        <rect x="81" y="81" width="440" height="440" fill="#f9e547" opacity="0.9" />
+        <rect
+          x="7"
+          y="7"
+          width="588"
+          height="738"
+          rx="24"
+          ry="24"
+          fill="#b8860b"
+          opacity="0.15"
+        />
+        <rect
+          x="81"
+          y="81"
+          width="440"
+          height="440"
+          fill="#f9e547"
+          opacity="0.9"
+        />
         <path
           d="M482.045,232.25H106.646l-3.771,40.991v68.319l88.815,6.832c0,15.092,12.236,27.328,27.328,27.328s27.328-12.236,27.328-27.328h136.81c0,15.092,12.236,27.328,27.328,27.328s27.328-12.236,27.328-27.328h55.979l5.336-6.832v-40.991l-17.08-68.319ZM164.362,290.321l-3.416,3.416h-44.407l-3.416-3.416,3.32-40.991,3.512-3.416h40.991l3.416,3.416v40.991ZM178.026,293.737l-6.832-3.416v-40.991l6.832-3.416h54.655l6.832,3.416v40.991l-6.832,3.416h-54.655ZM307.832,290.321l-6.832,3.416h-47.823l-6.832-3.416v-40.991l6.832-3.416h47.823l6.832,3.416v40.991ZM335.159,293.737h-13.664v-47.823h13.664v47.823ZM355.655,293.737h-13.664v-47.823h13.664v47.823ZM437.638,290.321l-6.832,3.416h-61.487l-6.832-3.416v-40.991l6.832-3.416h61.487l6.832,3.416v40.991ZM478.629,314.233h-27.328l-6.832-6.832v-58.071l6.832-3.416h27.116l13.705,54.826-13.493,13.493Z"
           fill="#0d0f14"
@@ -28,35 +52,50 @@
         />
       </svg>
       <div class="stop-title">
-        <span class="stop-name">{{ stop?.name }}</span>
-        <span class="stop-code">{{ stop?.code }}</span>
+        <span class="stop-name">{{ stop.name }}</span>
+        <span class="stop-code">{{ stop.code }}</span>
       </div>
     </div>
 
     <div class="stop-body">
       <p class="section-label">Najbliższe odjazdy</p>
 
-      <div v-if="!departures?.length" class="dep-empty">Brak danych o odjazdach</div>
+      <div v-if="loading" class="dep-loading">
+        <span class="loading-dot" />
+        <span class="loading-dot" />
+        <span class="loading-dot" />
+      </div>
+
+      <div v-else-if="!departures.length" class="dep-empty">
+        Brak danych o odjazdach
+      </div>
 
       <div v-else class="dep-table">
-        <div v-for="(dep, i) in departures?.slice(0, 8)" :key="i" class="dep-row">
-          <span class="dep-time">{{ dep.estimatedTime }}</span>
-          <span class="dep-badge" :class="dep.routeId < 100 ? 'tram' : 'bus'">{{
-            dep.routeId
-          }}</span>
-          <span class="dep-headsign">{{ dep.headsign }}</span>
+        <div
+          v-for="departure in departures.slice(0, 8)"
+          :key="departure.id"
+          class="dep-row"
+        >
+          <span class="dep-time">{{ departure.estimatedTimeString }}</span>
+          <span
+            class="dep-badge"
+            :class="departure.routeId < 100 ? 'tram' : 'bus'"
+          >
+            {{ departure.routeName }}
+          </span>
+          <span class="dep-headsign">{{ departure.headsign }}</span>
         </div>
       </div>
     </div>
 
-    <div v-if="isUserLogged" class="stop-favourites">
+    <div v-if="isLoggedIn" class="stop-favourites">
       <label class="fav-toggle">
         <input
           type="checkbox"
-          :checked="isFavouriteStop"
-          @change="toggleFavouriteStop?.(stop?.id)"
+          :checked="isFavouriteStop(stop.id)"
+          @change="toggleFavouriteStop(stop.id)"
         />
-        <span class="fav-track" :class="{ active: isFavouriteStop }">
+        <span class="fav-track" :class="{ active: isFavouriteStop(stop.id) }">
           <span class="fav-thumb" />
         </span>
         <span class="fav-label">Ulubiony przystanek</span>
@@ -65,21 +104,28 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  props: {
-    stop: Object,
-    departures: Array,
-    isFavouriteStop: Boolean,
-    toggleFavouriteStop: Function,
-  },
-  data() {
-    return { isUserLogged: false }
-  },
-  async mounted() {
-    this.isUserLogged = sessionStorage.getItem('loggedIn') === 'true'
-  },
-}
+<script setup lang="ts">
+import { onMounted, onBeforeUnmount } from 'vue'
+import type { Stop } from '@/models/stop'
+import { useDepartures } from '@/composables/useDepartures'
+import { useFavourites } from '@/composables/useFavourites'
+import { useAuth } from '@/composables/useAuth'
+
+const props = defineProps<{
+  stop: Stop
+}>()
+
+const { isFavouriteStop, toggleFavouriteStop } = useFavourites()
+const { departures, loading, loadDepartures, clearDepartures } = useDepartures()
+const { isLoggedIn } = useAuth()
+
+onMounted(async () => {
+  await loadDepartures(props.stop.id)
+})
+
+onBeforeUnmount(() => {
+  clearDepartures()
+})
 </script>
 
 <style scoped>
@@ -151,7 +197,7 @@ export default {
 
 .dep-row {
   display: grid;
-  grid-template-columns: 52px 28px 160px;
+  grid-template-columns: 65px 28px 160px;
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
@@ -163,6 +209,41 @@ export default {
 
 .dep-row:hover {
   background: rgba(255, 255, 255, 0.07);
+}
+
+.dep-loading {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+}
+
+.loading-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  animation: dot-bounce 1.2s infinite;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .dep-time {

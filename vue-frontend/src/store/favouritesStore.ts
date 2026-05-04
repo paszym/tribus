@@ -1,62 +1,64 @@
 import { defineStore } from 'pinia'
 
-export const useFavouritesStore = defineStore({
+export const favouritesStore = defineStore({
   id: 'favourites',
   state: () => ({
-    stops: [],
-    vehicles: [],
-    lines: [],
+    stops: [] as number[],
+    vehicles: [] as number[],
+    lines: [] as number[],
   }),
   actions: {
-    addStop(id) {
+    addStop(id: number) {
       if (!this.stops.includes(id)) {
         this.stops.push(id)
       }
     },
-    removeStop(id) {
+    removeStop(id: number) {
       this.stops = this.stops.filter((stopId) => stopId !== id)
     },
-    addVehicle(code) {
+    addVehicle(code: number) {
       if (!this.vehicles.includes(code)) {
         this.vehicles.push(code)
       }
     },
-    removeVehicle(code) {
-      this.vehicles = this.vehicles.filter((vehicleCode) => vehicleCode !== code)
+    removeVehicle(code: number) {
+      this.vehicles = this.vehicles.filter(
+        (vehicleCode) => vehicleCode !== code,
+      )
     },
-    addLine(id) {
+    addLine(id: number) {
       if (!this.lines.includes(id)) {
         this.lines.push(id)
       }
     },
-    removeLine(id) {
+    removeLine(id: number) {
       this.lines = this.lines.filter((routeId) => routeId !== id)
     },
 
-    stopExists(id) {
+    stopExists(id: number) {
       return this.stops.includes(id)
     },
-    vehicleExists(code) {
+    vehicleExists(code: number) {
       return this.vehicles.includes(code)
     },
-    lineExists(id) {
+    lineExists(id: number) {
       return this.lines.includes(id)
     },
-    setStops(newStops) {
+    setStops(newStops: number[]) {
       this.stops = newStops
     },
-    setVehicles(newVehicles) {
+    setVehicles(newVehicles: number[]) {
       this.vehicles = newVehicles
     },
-    setLines(newLines) {
+    setLines(newLines: number[]) {
       this.lines = newLines
     },
-    getAllAsJson() {
-      return JSON.stringify({
+    getAll() {
+      return {
         stops: this.stops,
         lines: this.lines,
         vehicles: this.vehicles,
-      })
+      }
     },
   },
 })
