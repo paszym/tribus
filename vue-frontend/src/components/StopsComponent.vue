@@ -222,10 +222,17 @@ onBeforeUnmount(() => {
   left: 50%;
   transform: translateX(-50%);
   width: min(520px, 90vw);
+  max-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
   gap: 8px;
   z-index: 1000;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.ui-panel::-webkit-scrollbar {
+  display: none;
 }
 
 /* ── Search pill ── */
@@ -375,7 +382,8 @@ onBeforeUnmount(() => {
   width: 100%;
   background: rgba(13, 15, 20, 0.92);
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
 /* Animacja wjazdu */

@@ -269,4 +269,21 @@ onBeforeUnmount(clearTimer)
   opacity: 0;
   transform: scale(0.97) translateY(-4px);
 }
+
+@media (max-width: 900px) {
+  .banner-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .banner-title {
+    font-size: 13px;
+    margin: 0 0 8px;
+  }
+
+  .banner-sub {
+    font-size: 11px;
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+}
 </style>
