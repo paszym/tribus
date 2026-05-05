@@ -393,6 +393,13 @@ onBeforeUnmount(() => {
   padding: 7px 13px;
 }
 
+@media (max-width: 900px) {
+  .map-hud,
+  .update-hud {
+    display: none;
+  }
+}
+
 .hud-pulse {
   width: 7px;
   height: 7px;
