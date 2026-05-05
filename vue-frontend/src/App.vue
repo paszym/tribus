@@ -1,18 +1,13 @@
 <template>
   <Analytics />
-  <div
-    style="width: 100%; height: 100vh; display: flex; flex-direction: column"
-  >
-    <!-- Floating pill navbar — unosi się nad mapą -->
-    <div class="nav-wrapper">
+  <div style="width: 100%; height: 100vh; display: flex; flex-direction: column">
+    <div class="nav-wrapper desktop-nav">
       <nav class="nav-pill">
         <div class="nav-brand">
           <img src="./assets/logo.png" alt="TriBus" class="brand-img" />
           <span class="brand-name">TriBus</span>
         </div>
-
         <div class="nav-divider" />
-
         <div class="nav-links">
           <RouterLink to="/" class="nav-link" exact-active-class="active">
             Mapa na żywo
@@ -21,9 +16,7 @@
             Odjazdy z przystanku
           </RouterLink>
         </div>
-
         <div class="nav-divider" />
-
         <div class="nav-right">
           <template v-if="isLoggedIn">
             <span class="user-badge">
@@ -39,16 +32,60 @@
       </nav>
     </div>
 
-    <!-- Mapa wypełnia resztę -->
+    <div class="mobile-nav">
+      <div class="mobile-brand-pill">
+        <img src="./assets/logo.png" alt="TriBus" class="brand-img" />
+        <span class="brand-name">TriBus</span>
+      </div>
+
+      <button
+        class="hamburger-pill"
+        :class="{ open: menuOpen }"
+        aria-label="Menu"
+        @click="menuOpen = !menuOpen"
+      >
+        <span class="hb-line" />
+        <span class="hb-line" />
+        <span class="hb-line" />
+      </button>
+
+      <Transition name="menu-drop">
+        <div v-if="menuOpen" class="mobile-dropdown" @click="menuOpen = false">
+          <RouterLink to="/" class="mobile-menu-item" exact-active-class="active">
+            Mapa na żywo
+          </RouterLink>
+          <RouterLink to="/stops" class="mobile-menu-item" exact-active-class="active">
+            Odjazdy z przystanku
+          </RouterLink>
+          <div class="mobile-divider" />
+          <template v-if="isLoggedIn">
+            <span class="mobile-user-badge">
+              <span class="user-dot" />
+              {{ username }}
+            </span>
+            <button class="mobile-menu-item logout" @click.stop="logout(); menuOpen = false">
+              <span class="menu-icon">↩</span>
+              Wyloguj
+            </button>
+          </template>
+          <RouterLink v-else to="/login" class="mobile-menu-item login" @click="menuOpen = false">
+            Zaloguj się
+          </RouterLink>
+        </div>
+      </Transition>
+    </div>
+
     <RouterView style="flex: 1; min-height: 0" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Analytics } from '@vercel/analytics/vue'
 import { useAuth } from '@/composables/useAuth'
 
 const { isLoggedIn, username, logout } = useAuth()
+const menuOpen = ref(false)
 </script>
 
 <style>
@@ -64,7 +101,8 @@ body {
   font-family: 'DM Sans', sans-serif;
 }
 
-/* Wrapper — pozycjonuje pill nad mapą */
+/* DESKTOP */
+
 .nav-wrapper {
   position: fixed;
   top: 16px;
@@ -72,10 +110,8 @@ body {
   transform: translateX(-50%);
   z-index: 2000;
   pointer-events: none;
-  /* mapa klikalana pod spodem */
 }
 
-/* Pill */
 .nav-pill {
   pointer-events: all;
   display: inline-flex;
@@ -91,13 +127,11 @@ body {
     0 4px 24px rgba(0, 0, 0, 0.4),
     0 1px 0 rgba(255, 255, 255, 0.05) inset;
   white-space: nowrap;
-
   max-width: 95vw;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Brand */
 .nav-brand {
   display: flex;
   align-items: center;
@@ -119,7 +153,6 @@ body {
   letter-spacing: 0.03em;
 }
 
-/* Separator */
 .nav-divider {
   width: 1px;
   height: 18px;
@@ -128,7 +161,6 @@ body {
   flex-shrink: 0;
 }
 
-/* Linki */
 .nav-links {
   display: flex;
   align-items: center;
@@ -144,9 +176,7 @@ body {
   color: rgba(255, 255, 255, 0.45);
   text-decoration: none;
   border-radius: 30px;
-  transition:
-    color 0.18s,
-    background 0.18s;
+  transition: color 0.18s, background 0.18s;
 }
 
 .nav-link:hover {
@@ -159,7 +189,6 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Prawa strona */
 .nav-right {
   display: flex;
   align-items: center;
@@ -188,17 +217,10 @@ body {
 }
 
 @keyframes dot-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25);
-  }
-
-  50% {
-    box-shadow: 0 0 0 5px rgba(46, 204, 113, 0);
-  }
+  0%, 100% { box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25); }
+  50%       { box-shadow: 0 0 0 5px rgba(46, 204, 113, 0); }
 }
 
-/* Przyciski */
 .nav-btn {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
@@ -210,10 +232,7 @@ body {
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   text-decoration: none;
-  transition:
-    color 0.18s,
-    border-color 0.18s,
-    background 0.18s;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
 }
 
 .nav-btn:hover {
@@ -230,5 +249,191 @@ body {
 .nav-btn.primary:hover {
   background: #21618c;
   border-color: #21618c;
+}
+
+/* MOBILE */
+
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.mobile-brand-pill {
+  pointer-events: all;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px 7px 9px;
+  background: rgba(13, 15, 20, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.hamburger-pill {
+  pointer-events: all;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 42px;
+  height: 42px;
+  background: rgba(13, 15, 20, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.hamburger-pill:hover,
+.hamburger-pill.open {
+  background: rgba(30, 35, 45, 0.95);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.hb-line {
+  display: block;
+  width: 16px;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 2px;
+  transition: transform 0.22s ease, opacity 0.22s ease, width 0.22s ease;
+  transform-origin: center;
+}
+
+.hamburger-pill.open .hb-line:nth-child(1) {
+  transform: translateY(5.5px) rotate(45deg);
+}
+.hamburger-pill.open .hb-line:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+.hamburger-pill.open .hb-line:nth-child(3) {
+  transform: translateY(-5.5px) rotate(-45deg);
+}
+
+.mobile-dropdown {
+  pointer-events: all;
+  position: absolute;
+  top: 62px;
+  right: 12px;
+  min-width: 220px;
+  background: rgba(13, 15, 20, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  padding: 6px;
+  overflow: hidden;
+}
+
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  text-align: left;
+}
+
+.mobile-menu-item:hover,
+.mobile-menu-item.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mobile-menu-item.login {
+  color: #fff;
+  background: #1a5276;
+  margin-top: 2px;
+}
+
+.mobile-menu-item.login:hover {
+  background: #21618c;
+}
+
+.mobile-menu-item.logout {
+  color: rgba(255, 100, 100, 0.7);
+}
+
+.mobile-menu-item.logout:hover {
+  color: rgba(255, 100, 100, 1);
+  background: rgba(255, 50, 50, 0.07);
+}
+
+.menu-icon {
+  font-size: 15px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.mobile-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 4px 6px;
+}
+
+.mobile-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Transition */
+.menu-drop-enter-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.menu-drop-leave-active {
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+.menu-drop-enter-from,
+.menu-drop-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.97);
+}
+
+@media (max-width: 900px) {
+  .desktop-nav {
+    display: none;
+  }
+  .mobile-nav {
+    display: block;
+  }
 }
 </style>

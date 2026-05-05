@@ -9,6 +9,12 @@
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
 
+@media (max-width: 900px) {
+  .leaflet-control-zoom {
+    display: none;
+  }
+}
+
 .leaflet-container {
   background: #000;
 }
