@@ -1,19 +1,23 @@
 <template>
   <Analytics />
-  <div style="width: 100%; height: 100vh; display: flex; flex-direction: column">
+  <div
+    style="width: 100%; height: 100vh; display: flex; flex-direction: column"
+  >
     <div class="nav-wrapper desktop-nav">
       <nav class="nav-pill">
-        <div class="nav-brand">
-          <img src="./assets/logo.png" alt="TriBus" class="brand-img" />
-          <span class="brand-name">TriBus</span>
-        </div>
+        <RouterLink to="/">
+          <div class="nav-brand">
+            <img src="./assets/logo.png" alt="TriBus" class="brand-img" />
+            <span class="brand-name">TriBus</span>
+          </div>
+        </RouterLink>
         <div class="nav-divider" />
         <div class="nav-links">
           <RouterLink to="/" class="nav-link" exact-active-class="active">
             Mapa na żywo
           </RouterLink>
           <RouterLink to="/stops" class="nav-link" exact-active-class="active">
-            Odjazdy z przystanku
+            Tablica odjazdów
           </RouterLink>
         </div>
         <div class="nav-divider" />
@@ -33,46 +37,181 @@
     </div>
 
     <div class="mobile-nav">
-      <div class="mobile-brand-pill">
-        <img src="./assets/logo.png" alt="TriBus" class="brand-img" />
-        <span class="brand-name">TriBus</span>
-      </div>
-
-      <button
-        class="hamburger-pill"
-        :class="{ open: menuOpen }"
-        aria-label="Menu"
-        @click="menuOpen = !menuOpen"
-      >
-        <span class="hb-line" />
-        <span class="hb-line" />
-        <span class="hb-line" />
-      </button>
-
-      <Transition name="menu-drop">
-        <div v-if="menuOpen" class="mobile-dropdown" @click="menuOpen = false">
-          <RouterLink to="/" class="mobile-menu-item" exact-active-class="active">
-            Mapa na żywo
-          </RouterLink>
-          <RouterLink to="/stops" class="mobile-menu-item" exact-active-class="active">
-            Odjazdy z przystanku
-          </RouterLink>
-          <div class="mobile-divider" />
-          <template v-if="isLoggedIn">
-            <span class="mobile-user-badge">
-              <span class="user-dot" />
-              {{ username }}
-            </span>
-            <button class="mobile-menu-item logout" @click.stop="logout(); menuOpen = false">
-              <span class="menu-icon">↩</span>
-              Wyloguj
-            </button>
-          </template>
-          <RouterLink v-else to="/login" class="mobile-menu-item login" @click="menuOpen = false">
-            Zaloguj się
-          </RouterLink>
+      <RouterLink to="/">
+        <div class="mobile-brand-pill">
+          <img src="./assets/logo.png" alt="TriBus" class="brand-img" />
+          <span class="brand-name">TriBus</span>
         </div>
-      </Transition>
+      </RouterLink>
+
+      <div class="mobile-icons">
+        <RouterLink
+          to="/"
+          class="mobile-icon-pill"
+          exact-active-class="active"
+          aria-label="Mapa na żywo"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 3L3 6.5v14L9 17l6 3.5 6-3.5V3l-6 3.5L9 3z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+              fill="none"
+            />
+            <line
+              x1="9"
+              y1="3"
+              x2="9"
+              y2="17"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <line
+              x1="15"
+              y1="6.5"
+              x2="15"
+              y2="20.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+          </svg>
+        </RouterLink>
+
+        <RouterLink
+          to="/stops"
+          class="mobile-icon-pill"
+          exact-active-class="active"
+          aria-label="Tablica odjazdów"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="3"
+              y="3"
+              width="18"
+              height="14"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <line
+              x1="7"
+              y1="8"
+              x2="17"
+              y2="8"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <line
+              x1="7"
+              y1="12"
+              x2="14"
+              y2="12"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <line
+              x1="9"
+              y1="21"
+              x2="15"
+              y2="21"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <line
+              x1="12"
+              y1="17"
+              x2="12"
+              y2="21"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+          </svg>
+        </RouterLink>
+
+        <template v-if="isLoggedIn">
+          <button
+            class="mobile-icon-pill"
+            aria-label="Wyloguj"
+            @click="logout()"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <polyline
+                points="16 17 21 12 16 7"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <line
+                x1="21"
+                y1="12"
+                x2="9"
+                y2="12"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </template>
+
+        <RouterLink
+          v-else
+          to="/login"
+          class="mobile-icon-pill"
+          aria-label="Zaloguj się"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <circle
+              cx="12"
+              cy="7"
+              r="4"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+          </svg>
+        </RouterLink>
+      </div>
     </div>
 
     <RouterView style="flex: 1; min-height: 0" />
@@ -80,12 +219,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Analytics } from '@vercel/analytics/vue'
 import { useAuth } from '@/composables/useAuth'
 
 const { isLoggedIn, username, logout } = useAuth()
-const menuOpen = ref(false)
 </script>
 
 <style>
@@ -176,7 +313,9 @@ body {
   color: rgba(255, 255, 255, 0.45);
   text-decoration: none;
   border-radius: 30px;
-  transition: color 0.18s, background 0.18s;
+  transition:
+    color 0.18s,
+    background 0.18s;
 }
 
 .nav-link:hover {
@@ -217,8 +356,13 @@ body {
 }
 
 @keyframes dot-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25); }
-  50%       { box-shadow: 0 0 0 5px rgba(46, 204, 113, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(46, 204, 113, 0);
+  }
 }
 
 .nav-btn {
@@ -232,7 +376,10 @@ body {
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   text-decoration: none;
-  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s;
 }
 
 .nav-btn:hover {
@@ -280,16 +427,18 @@ body {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
-.hamburger-pill {
+.mobile-icons {
   pointer-events: all;
   position: absolute;
   top: 12px;
   right: 12px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.mobile-icon-pill {
+  pointer-events: all;
   width: 42px;
   height: 42px;
   background: rgba(13, 15, 20, 0.88);
@@ -298,134 +447,29 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   padding: 0;
-  transition: background 0.18s, border-color 0.18s;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition:
+    background 0.18s,
+    border-color 0.18s,
+    color 0.18s;
 }
 
-.hamburger-pill:hover,
-.hamburger-pill.open {
+.mobile-icon-pill:hover {
   background: rgba(30, 35, 45, 0.95);
   border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.hb-line {
-  display: block;
-  width: 16px;
-  height: 1.5px;
-  background: rgba(255, 255, 255, 0.75);
-  border-radius: 2px;
-  transition: transform 0.22s ease, opacity 0.22s ease, width 0.22s ease;
-  transform-origin: center;
-}
-
-.hamburger-pill.open .hb-line:nth-child(1) {
-  transform: translateY(5.5px) rotate(45deg);
-}
-.hamburger-pill.open .hb-line:nth-child(2) {
-  opacity: 0;
-  width: 0;
-}
-.hamburger-pill.open .hb-line:nth-child(3) {
-  transform: translateY(-5.5px) rotate(-45deg);
-}
-
-.mobile-dropdown {
-  pointer-events: all;
-  position: absolute;
-  top: 62px;
-  right: 12px;
-  min-width: 220px;
-  background: rgba(13, 15, 20, 0.95);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.55),
-    0 1px 0 rgba(255, 255, 255, 0.05) inset;
-  padding: 6px;
-  overflow: hidden;
-}
-
-.mobile-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 14px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
-  text-decoration: none;
-  border-radius: 12px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
-  text-align: left;
-}
-
-.mobile-menu-item:hover,
-.mobile-menu-item.active {
+.mobile-icon-pill.active {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.mobile-menu-item.login {
-  color: #fff;
-  background: #1a5276;
-  margin-top: 2px;
-}
-
-.mobile-menu-item.login:hover {
-  background: #21618c;
-}
-
-.mobile-menu-item.logout {
-  color: rgba(255, 100, 100, 0.7);
-}
-
-.mobile-menu-item.logout:hover {
-  color: rgba(255, 100, 100, 1);
-  background: rgba(255, 50, 50, 0.07);
-}
-
-.menu-icon {
-  font-size: 15px;
-  width: 20px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.mobile-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.07);
-  margin: 4px 6px;
-}
-
-.mobile-user-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-/* Transition */
-.menu-drop-enter-active {
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-.menu-drop-leave-active {
-  transition: opacity 0.14s ease, transform 0.14s ease;
-}
-.menu-drop-enter-from,
-.menu-drop-leave-to {
-  opacity: 0;
-  transform: translateY(-8px) scale(0.97);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 900px) {

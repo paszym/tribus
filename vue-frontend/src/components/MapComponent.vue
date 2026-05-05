@@ -7,45 +7,62 @@
     <div class="map-hud update-hud">
       <span class="hud-pulse" :class="{ syncing: isSyncing }" />
       <span class="hud-text">
-        {{
-          isSyncing ? 'Synchronizacja...' : `Odświeżenie za ${updateCountdown}s`
-        }}
+        {{ isSyncing ? 'Synchronizacja...' : `${updateCountdown}s` }}
       </span>
     </div>
 
-    <!-- Panel filtrów -->
-    <div v-if="isLoggedIn" class="map-hud filters-hud">
-      <p class="filters-title">Filtry ulubionych</p>
+    <!-- Przycisk ulubionych + panel -->
+    <div v-if="isLoggedIn" class="favourites-anchor">
+      <button
+        class="fav-pill"
+        :class="{ open: favOpen }"
+        aria-label="Ulubione"
+        @click="favOpen = !favOpen"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            :fill="favOpen ? '#e74c3c' : 'rgba(255,255,255,0.5)'"
+            style="transition: fill 0.2s"
+          />
+        </svg>
+      </button>
 
-      <label class="filter-row" :class="{ on: onlyStops }">
-        <span class="filter-label">Tylko przystanki</span>
-        <span class="filter-toggle" :class="{ on: onlyStops }">
-          <input v-model="onlyStops" type="checkbox" />
-          <span class="toggle-track">
-            <span class="toggle-thumb" />
-          </span>
-        </span>
-      </label>
+      <Transition name="fav-drop">
+        <div v-if="favOpen" class="fav-panel">
+          <p class="filters-title">Filtry ulubionych</p>
 
-      <label class="filter-row" :class="{ on: onlyLines }">
-        <span class="filter-label">Tylko linie</span>
-        <span class="filter-toggle" :class="{ on: onlyLines }">
-          <input v-model="onlyLines" type="checkbox" />
-          <span class="toggle-track">
-            <span class="toggle-thumb" />
-          </span>
-        </span>
-      </label>
+          <label class="filter-row" :class="{ on: onlyStops }">
+            <span class="filter-label">Tylko przystanki</span>
+            <span class="filter-toggle" :class="{ on: onlyStops }">
+              <input v-model="onlyStops" type="checkbox" />
+              <span class="toggle-track"><span class="toggle-thumb" /></span>
+            </span>
+          </label>
 
-      <label class="filter-row" :class="{ on: onlyVehicles }">
-        <span class="filter-label">Tylko pojazdy</span>
-        <span class="filter-toggle" :class="{ on: onlyVehicles }">
-          <input v-model="onlyVehicles" type="checkbox" />
-          <span class="toggle-track">
-            <span class="toggle-thumb" />
-          </span>
-        </span>
-      </label>
+          <label class="filter-row" :class="{ on: onlyLines }">
+            <span class="filter-label">Tylko linie</span>
+            <span class="filter-toggle" :class="{ on: onlyLines }">
+              <input v-model="onlyLines" type="checkbox" />
+              <span class="toggle-track"><span class="toggle-thumb" /></span>
+            </span>
+          </label>
+
+          <label class="filter-row" :class="{ on: onlyVehicles }">
+            <span class="filter-label">Tylko pojazdy</span>
+            <span class="filter-toggle" :class="{ on: onlyVehicles }">
+              <input v-model="onlyVehicles" type="checkbox" />
+              <span class="toggle-track"><span class="toggle-thumb" /></span>
+            </span>
+          </label>
+        </div>
+      </Transition>
     </div>
 
     <!-- Legenda -->
@@ -63,6 +80,7 @@
         <span class="legend-text">Przystanek</span>
       </div>
     </div>
+
     <DemoBanner :is-loading="vehiclesLoading" :has-error="vehiclesHasError" />
   </div>
 </template>
@@ -113,6 +131,7 @@ const {
   isSyncing,
 } = useMapRefresh(updateVehiclePositions)
 const { isLoggedIn } = useAuth()
+const favOpen = ref(false)
 
 const vehiclesHasError = computed(() => vehiclesError.value !== null)
 
@@ -383,21 +402,22 @@ onBeforeUnmount(() => {
   font-family: 'DM Sans', sans-serif;
 }
 
-/* Countdown (góra prawa) */
+/* Countdown */
 .update-hud {
-  top: 14px;
+  top: 20px;
   right: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 13px;
-}
-
-@media (max-width: 900px) {
-  .map-hud,
-  .update-hud {
-    display: none;
-  }
+  padding: 6px 13px;
+  background: rgba(13, 15, 20, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
 }
 
 .hud-pulse {
@@ -419,7 +439,6 @@ onBeforeUnmount(() => {
   100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.2;
   }
@@ -433,17 +452,76 @@ onBeforeUnmount(() => {
   letter-spacing: 0.02em;
 }
 
-/* Filtry (góra prawa, pod countdown) */
-.filters-hud {
-  top: 56px;
-  right: 14px;
+/* Favourites anchor */
+.favourites-anchor {
+  position: absolute;
+  top: 100px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Heart button */
+.fav-pill {
+  width: 42px;
+  height: 42px;
+  background: rgba(13, 15, 20, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background 0.18s,
+    border-color 0.18s;
+}
+
+.fav-pill:active {
+  transform: scale(0.93);
+}
+
+/* Panel */
+.fav-panel {
+  background: rgba(15, 17, 23, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 190px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
 }
 
+/* Transition */
+.fav-drop-enter-active {
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+.fav-drop-leave-active {
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
+}
+.fav-drop-enter-from,
+.fav-drop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+}
+
+/* Filtry */
 .filters-title {
   font-size: 10px;
   font-weight: 600;
@@ -479,7 +557,6 @@ onBeforeUnmount(() => {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Toggle */
 .filter-toggle input {
   display: none;
 }
@@ -520,7 +597,7 @@ onBeforeUnmount(() => {
   background: white;
 }
 
-/* Legenda (dół lewa) */
+/* Legenda */
 .legend-hud {
   bottom: 28px;
   left: 14px;
@@ -547,11 +624,9 @@ onBeforeUnmount(() => {
 .legend-dot.tram {
   background: #c0392b;
 }
-
 .legend-dot.bus {
   background: #1a5276;
 }
-
 .legend-dot.stop {
   background: #b8860b;
 }
@@ -560,5 +635,12 @@ onBeforeUnmount(() => {
   font-size: 11px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 900px) {
+  .update-hud,
+  .legend-hud {
+    display: none;
+  }
 }
 </style>
