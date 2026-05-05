@@ -4,19 +4,7 @@
 
 # TriBus
 
-**TriBus** to fullstackowa aplikacja prezentująca dane pochodzące z Zarządu Transportu Miejskiego w Gdańsku  — przystanki, linie i pozycje autobusów w czasie rzeczywistym. Projekt integruje publiczne API ZTM z własnym backendem Node.js/Express i pokazuje pełny flow: frontend → backend → autoryzacja → testy → deploy.
-
-----------
-
-## Struktura projektu
-
-```
-tribus/
-├─ vue-frontend/
-├─ express-backend/
-└─ README.md
-
-```
+**TriBus** to aplikacja przeglądarkowa prezentująca dane pochodzące z Zarządu Transportu Miejskiego w Gdańsku  — pozycje autobusów i tablice odjazdów w czasie rzeczywistym. Projekt integruje publiczne API ZTM z własnym backendem Node.js/Express. Projekt w trakcie rozwoju.
 
 ----------
 
@@ -24,9 +12,9 @@ tribus/
 
 **Frontend** — Vue 3, Pinia, Vue Router, Leaflet + OpenStreetMap, TailwindCSS, Vee-Validate, Vue Toast Notification
 
-**Backend** — Node.js, Express, JWT + bcrypt, integracja z publicznym API ZTM, Swagger (`/api-docs`)
+**Backend** — Node.js, Express, JWT + bcrypt, integracja z publicznym API ZTM, Swagger
 
-**Testy** — Vitest, Nightwatch, Cypress (e2e)
+**Testy** — Vitest, Cypress
  
 **Hosting** — Frontend: Vercel · Backend: Render · Baza danych: MongoDB Atlas
 
@@ -37,7 +25,7 @@ tribus/
 -   Mapa na żywo z pozycjami autobusów i przystankami (Leaflet + OpenStreetMap)
 -   Rejestracja i logowanie użytkowników (JWT + bcrypt)
 -   Ulubione przystanki i linie per użytkownik
--   Backend jako proxy do API ZTM z cache po stronie serwera
+-   Backend jako proxy do API ZTM i komunikacja z bazą danych
 -   Dokumentacja API przez Swagger
 
 ----------
@@ -57,7 +45,7 @@ npm run dev
 
 ```
 
-Adresy backendu konfiguruje się przez zmienne środowiskowe w `.env` 
+Konfiguracja środowiska zaprezentowana w `.env.example` 
 
 ----------
 
