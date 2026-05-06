@@ -32,7 +32,7 @@
           </span>
         </div>
 
-        <!-- WYNIKI -->
+        <!-- WYNIKI WYSZUKIWANIA -->
         <div
           v-if="showResults && filteredStops.length"
           class="results-dropdown"
@@ -59,37 +59,9 @@
             </button>
           </div>
         </div>
-
-        <!-- ULUBIONE -->
-        <div
-          v-if="isLoggedIn && !searchQuery && favouriteStops.length"
-          class="results-dropdown"
-        >
-          <p class="dropdown-label">Ulubione przystanki</p>
-
-          <div
-            v-for="stop in favouriteStops"
-            :key="stop.id"
-            class="result-row"
-            :class="{ active: stop.id === currentStopId }"
-            @click="selectStop(stop)"
-          >
-            <div class="result-left">
-              <span class="result-name">{{ stop.name }}</span>
-              <span class="result-code">{{ stop.code }}</span>
-            </div>
-
-            <button
-              class="fav-btn starred"
-              @click.stop="toggleFavouriteStop(stop.id)"
-            >
-              ★
-            </button>
-          </div>
-        </div>
       </div>
 
-      <!-- PANEL ODJAZDÓW -->
+      <!-- PANEL ODJAZDÓW – wyszukany przystanek -->
       <transition name="panel-slide">
         <div v-if="currentStopName" class="departures-panel">
           <div class="panel-header">
@@ -109,7 +81,36 @@
               :key="i"
               class="dep-row"
             >
-              <span class="dep-time">{{ departure.estimatedTimeString }}</span>
+              <span class="dep-time-wrap">
+                <span
+                  class="dep-time"
+                  :class="{
+                    'dep-time--now': departure.estimatedTimeString === 'teraz',
+                  }"
+                >
+                  {{ departure.estimatedTimeString }}
+                </span>
+                <sup
+                  v-if="Math.floor(Math.abs(departure.delaySeconds) / 60) !== 0"
+                  :title="
+                    departure.delaySeconds < 0
+                      ? `Przyspieszenie ${Math.floor(Math.abs(departure.delaySeconds) / 60)} min`
+                      : `Opóźnienie ${Math.floor(departure.delaySeconds / 60)} min`
+                  "
+                  class="dep-delay"
+                  :class="{
+                    'delay-early': departure.delaySeconds < 0,
+                    'delay-ok':
+                      departure.delaySeconds > 0 &&
+                      departure.delaySeconds <= 120,
+                    'delay-late': departure.delaySeconds > 120,
+                  }"
+                >
+                  {{ departure.delaySeconds < 0 ? '-' : '+'
+                  }}{{ Math.floor(Math.abs(departure.delaySeconds) / 60) }}
+                </sup>
+                <span v-else class="dep-on-time" title="Punktualnie" />
+              </span>
               <span
                 class="dep-badge"
                 :class="departure.routeId < 100 ? 'tram' : 'bus'"
@@ -124,22 +125,128 @@
           </div>
         </div>
       </transition>
+
+      <div v-if="!isLoggedIn" class="fav-info">
+        <span>Zaloguj się i miej ulubione przystanki zawsze pod ręką</span>
+      </div>
+
+      <!-- ULUBIONE PRZYSTANKI – panele odjazdów -->
+      <template v-if="isLoggedIn && favouriteStops.length">
+        <div class="favourites-section-label">Ulubione przystanki</div>
+        <div
+          v-for="stop in favouriteStops"
+          :key="stop.id"
+          class="departures-panel fav-panel"
+        >
+          <div class="panel-header" @click="reloadFavDepartures(stop.id)">
+            <span class="panel-stop-name">{{ stop.name }} {{ stop.code }}</span>
+            <div class="panel-header-actions">
+              <button
+                class="fav-btn starred panel-fav-btn"
+                title="Usuń z ulubionych"
+                @click="toggleFavouriteStop(stop.id)"
+              >
+                ★
+              </button>
+              <button
+                class="panel-refresh"
+                :class="{ spinning: favLoadingIds.has(stop.id) }"
+                title="Odśwież"
+                @click="reloadFavDepartures(stop.id)"
+              >
+                ↻
+              </button>
+            </div>
+          </div>
+
+          <div v-if="favLoadingIds.has(stop.id)" class="panel-loading">
+            Ładowanie...
+          </div>
+
+          <div
+            v-else-if="
+              !favDepartures[stop.id] || !favDepartures[stop.id]?.length
+            "
+            class="panel-empty"
+          >
+            Brak odjazdów w najbliższym czasie
+          </div>
+
+          <div v-else class="dep-list">
+            <div
+              v-for="(departure, i) in favDepartures[stop.id]?.slice(0, 15) ??
+              []"
+              :key="i"
+              class="dep-row"
+            >
+              <span class="dep-time-wrap">
+                <span
+                  class="dep-time"
+                  :class="{
+                    'dep-time--now': departure.estimatedTimeString === 'teraz',
+                  }"
+                >
+                  {{ departure.estimatedTimeString }}
+                </span>
+                <sup
+                  v-if="Math.floor(Math.abs(departure.delaySeconds) / 60) !== 0"
+                  :title="
+                    departure.delaySeconds < 0
+                      ? `Przyspieszenie ${Math.floor(Math.abs(departure.delaySeconds) / 60)} min`
+                      : `Opóźnienie ${Math.floor(departure.delaySeconds / 60)} min`
+                  "
+                  class="dep-delay"
+                  :class="{
+                    'delay-early': departure.delaySeconds < 0,
+                    'delay-ok':
+                      departure.delaySeconds > 0 &&
+                      departure.delaySeconds <= 120,
+                    'delay-late': departure.delaySeconds > 120,
+                  }"
+                >
+                  {{ departure.delaySeconds < 0 ? '-' : '+'
+                  }}{{ Math.floor(Math.abs(departure.delaySeconds) / 60) }}
+                </sup>
+                <span v-else class="dep-on-time" title="Punktualnie" />
+              </span>
+              <span
+                class="dep-badge"
+                :class="departure.routeId < 100 ? 'tram' : 'bus'"
+              >
+                {{ departure.routeName }}
+              </span>
+              <span class="dep-headsign">{{ departure.headsign }}</span>
+            </div>
+            <p
+              v-if="(favDepartures[stop.id]?.length ?? 0) > 15"
+              class="dep-more"
+            >
+              + {{ (favDepartures[stop.id]?.length ?? 0) - 15 }} kolejnych
+              odjazdów
+            </p>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useStops } from '@/composables/useStops'
 import { useDepartures } from '@/composables/useDepartures'
 import { useFavourites } from '@/composables/useFavourites'
 import type { Stop } from '@/models/stop'
+import type { Departure } from '@/models/departure'
 
 const searchQuery = ref('')
 const currentStopName = ref('')
 const currentStopId = ref<number | null>(null)
 const showResults = ref(false)
+
+const favDepartures = ref<Record<number, Departure[]>>({})
+const favLoadingIds = ref<Set<number>>(new Set())
 
 const { isLoggedIn } = useAuth()
 const { stops, loadStops, loading } = useStops()
@@ -156,6 +263,65 @@ const filteredStops = computed(() => {
 
 const favouriteStops = computed(() =>
   stops.value.filter((stop) => isFavouriteStop(stop.id)),
+)
+
+async function loadAllFavDepartures() {
+  for (const stop of favouriteStops.value) {
+    await loadFavDepartures(stop.id)
+  }
+}
+
+const MIN_LOADING_MS = 500
+
+async function loadFavDepartures(stopId: number, reload = false) {
+  favLoadingIds.value = new Set([...favLoadingIds.value, stopId])
+  const start = Date.now()
+  try {
+    const result = await loadDepartures(stopId)
+    if (Array.isArray(result)) {
+      favDepartures.value = { ...favDepartures.value, [stopId]: result }
+    } else {
+      favDepartures.value = {
+        ...favDepartures.value,
+        [stopId]: [...departures.value],
+      }
+    }
+  } finally {
+    if (reload) {
+      const elapsed = Date.now() - start
+      const remaining = MIN_LOADING_MS - elapsed
+      if (remaining > 0) {
+        await new Promise((resolve) => setTimeout(resolve, remaining))
+      }
+    }
+    const next = new Set(favLoadingIds.value)
+    next.delete(stopId)
+    favLoadingIds.value = next
+  }
+}
+
+async function reloadFavDepartures(stopId: number) {
+  await loadFavDepartures(stopId, true)
+}
+
+watch(
+  () => favouriteStops.value.map((s) => s.id).join(','),
+  async (newIds, oldIds) => {
+    if (newIds === oldIds) return
+    for (const stop of favouriteStops.value) {
+      if (!favDepartures.value[stop.id]) {
+        await loadFavDepartures(stop.id)
+      }
+    }
+    const currentIds = new Set(favouriteStops.value.map((s) => s.id))
+    for (const id of Object.keys(favDepartures.value).map(Number)) {
+      if (!currentIds.has(id)) {
+        const updated = { ...favDepartures.value }
+        delete updated[id]
+        favDepartures.value = updated
+      }
+    }
+  },
 )
 
 function onSearch() {
@@ -191,6 +357,9 @@ function closePanel() {
 onMounted(async () => {
   await loadStops()
   await fetchFavourites()
+  if (isLoggedIn.value) {
+    await loadAllFavDepartures()
+  }
   document.addEventListener('click', handleOutsideClick)
 })
 
@@ -209,7 +378,6 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-/* Mapa tło */
 .bg-map {
   position: absolute;
   inset: 0;
@@ -228,11 +396,25 @@ onBeforeUnmount(() => {
   gap: 8px;
   z-index: 1000;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: auto;
+  scrollbar-color: rgba(249, 229, 71, 0.25) transparent;
 }
 
 .ui-panel::-webkit-scrollbar {
-  display: none;
+  width: 4px;
+}
+
+.ui-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ui-panel::-webkit-scrollbar-thumb {
+  background: rgba(249, 229, 71, 0.25);
+  border-radius: 99px;
+}
+
+.ui-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 229, 71, 0.55);
 }
 
 /* ── Search pill ── */
@@ -298,15 +480,6 @@ onBeforeUnmount(() => {
   background: rgba(13, 15, 20, 0.94);
   border-radius: 16px;
   overflow: hidden;
-}
-
-.dropdown-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: rgba(255, 255, 255, 0.25);
-  padding: 10px 16px 4px;
 }
 
 .result-row {
@@ -377,16 +550,41 @@ onBeforeUnmount(() => {
   color: #f9e547;
 }
 
+/* ── Sekcja ulubionych ── */
+.favourites-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 4px 4px 0;
+}
+
+.fav-info {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 4px 4px 0;
+  text-align: center;
+}
+
 /* ── Panel odjazdów ── */
 .departures-panel {
-  width: 100%;
+  width: 99%;
   background: rgba(13, 15, 20, 0.92);
   border-radius: 16px;
   overflow: visible;
   flex-shrink: 0;
 }
 
-/* Animacja wjazdu */
+/* Ulubiony panel – lekko inne obramowanie nagłówka */
+.fav-panel .panel-header {
+  border-bottom-color: rgba(249, 229, 71, 0.2);
+  background: rgba(249, 229, 71, 0.05);
+}
+
 .panel-slide-enter-active,
 .panel-slide-leave-active {
   transition: all 0.2s;
@@ -405,20 +603,7 @@ onBeforeUnmount(() => {
   padding: 12px 14px;
   border-bottom: 1px solid rgba(184, 134, 11, 0.3);
   background: rgba(184, 134, 11, 0.08);
-}
-
-.panel-stop-icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.panel-header-text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
+  border-radius: 16px 16px 0 0;
 }
 
 .panel-stop-name {
@@ -428,13 +613,50 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
 }
 
-.panel-stop-sub {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: rgba(249, 229, 71, 0.4);
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.panel-fav-btn {
+  font-size: 14px;
+  padding: 2px 4px;
+}
+
+.panel-refresh {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  transition:
+    color 0.15s,
+    transform 0.15s;
+}
+
+.panel-refresh:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.panel-refresh.spinning {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .panel-close {
@@ -456,42 +678,14 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.07);
 }
 
-/* Loading dots */
 .panel-loading {
   display: flex;
   justify-content: center;
   gap: 6px;
   padding: 20px;
-}
-
-.loading-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  animation: dot-bounce 1.2s infinite;
-}
-
-.loading-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.loading-dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes dot-bounce {
-  0%,
-  80%,
-  100% {
-    transform: scale(0.7);
-    opacity: 0.4;
-  }
-
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
 }
 
 .panel-empty {
@@ -527,14 +721,63 @@ onBeforeUnmount(() => {
 
 .dep-time {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: 11.7px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.9);
-  width: 160px;
+}
+
+.dep-time--now {
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.dep-time-wrap {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.dep-delay {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78em;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: super;
+  position: relative;
+  top: 0em;
+  left: 0.5em;
+}
+
+.delay-early {
+  color: #4be6eb;
+}
+.delay-ok {
+  color: #f9e547;
+}
+.delay-late {
+  color: #e74c3c;
+}
+.dep-on-time {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2ecc71;
+  position: relative;
+  left: 0.35em;
 }
 
 .dep-badge {
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
   padding: 2px 4px;
   border-radius: 5px;
@@ -553,7 +796,7 @@ onBeforeUnmount(() => {
 }
 
 .dep-headsign {
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.45);
   white-space: nowrap;
   overflow: hidden;

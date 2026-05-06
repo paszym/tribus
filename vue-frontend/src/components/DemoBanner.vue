@@ -22,8 +22,8 @@
           <p class="banner-title">Oczekiwanie na dane&hellip;</p>
           <p class="banner-sub">
             Backend projektu hostowany jest bezpłatnie i po okresie
-            nieaktywności wymaga chwili na uruchomienie. Prosimy o
-            cierpliwość&nbsp;—&nbsp;dane pojawią się automatycznie.
+            nieaktywności wymaga chwili na uruchomienie. Dane pojawią się
+            automatycznie.
           </p>
           <div class="banner-progress">
             <div class="progress-bar" />

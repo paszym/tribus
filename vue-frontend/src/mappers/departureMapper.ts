@@ -3,14 +3,14 @@ import type { Departure } from '@/models/departure'
 
 export function mapDeparture(dto: DepartureDto): Departure {
   const estimatedTime = new Date(dto.estimatedTime)
-  const delaySeconds = dto.delayInSeconds
+  const delaySeconds = dto.delayInSeconds || 0
   const minutesUntilDeparture = Math.floor(
     (estimatedTime.valueOf() - Date.now()) / (1000 * 60),
   )
 
   function DepartureTimeString(): string {
     const minutes = minutesUntilDeparture
-    return minutes < 1 ? 'za <1 min' : `za ${minutes} min`
+    return minutes < 1 ? 'teraz' : `${minutes} min`
   }
 
   return {

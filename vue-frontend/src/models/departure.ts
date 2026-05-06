@@ -5,7 +5,7 @@ export interface Departure {
   headsign: string
   estimatedTime: Date
   theoreticalTime: Date
-  delaySeconds: number | null
+  delaySeconds: number
   status: 'REALTIME' | 'SCHEDULED'
   vehicleId: number | null
   vehicleCode: number | null
