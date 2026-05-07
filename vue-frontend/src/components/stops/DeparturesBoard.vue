@@ -83,7 +83,12 @@
       <!-- ULUBIONE PRZYSTANKI – panele odjazdów -->
       <template v-if="isLoggedIn && favouriteStops.length">
         <div class="favourites-section-label">Ulubione przystanki</div>
-        <StopBoard v-for="stop in favouriteStops" :key="stop.id" :stop="stop" />
+        <StopBoard
+          v-for="stop in favouriteStops"
+          :key="stop.id"
+          :stop="stop"
+          :can-close="false"
+        />
       </template>
     </div>
   </div>

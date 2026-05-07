@@ -329,6 +329,7 @@ function createStopMarker(stop: Stop) {
     const app = createApp(StopBoard, {
       stop,
       'can-close': true,
+      compact: true,
       onClose: () => marker.closePopup(),
       onExpanded: () => {
         nextTick(() => panPopupIntoView(marker))

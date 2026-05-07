@@ -138,10 +138,17 @@ import type { Stop } from '@/models/stop'
 const MAX_DEPARTURES = 6
 const sliceDepartures = ref(true)
 
-const props = defineProps<{
-  stop: Stop
-  canClose?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    stop: Stop
+    canClose?: boolean
+    compact?: boolean
+  }>(),
+  {
+    canClose: true,
+    compact: false,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -357,6 +364,12 @@ watch(refreshTick, () => {
 
 .dep-list {
   padding: 8px 0;
+}
+
+.dep-list--compact {
+  padding: 8px 0;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .dep-row {
