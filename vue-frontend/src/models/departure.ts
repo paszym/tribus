@@ -3,7 +3,7 @@ export interface Departure {
   routeId: number
   routeName: string
   headsign: string
-  estimatedTime: Date
+  estimatedTime: string
   theoreticalTime: Date
   delaySeconds: number
   status: 'REALTIME' | 'SCHEDULED'

@@ -2,10 +2,13 @@ import type { DepartureDto, DeparturesResponseDto } from '@/types/departure.dto'
 import type { Departure } from '@/models/departure'
 
 export function mapDeparture(dto: DepartureDto): Departure {
-  const estimatedTime = new Date(dto.estimatedTime)
+  const estimatedTime = new Date(dto.estimatedTime).toLocaleTimeString(
+    'pl-PL',
+    { hour: '2-digit', minute: '2-digit' },
+  )
   const delaySeconds = dto.delayInSeconds || 0
   const minutesUntilDeparture = Math.floor(
-    (estimatedTime.valueOf() - Date.now()) / (1000 * 60),
+    (new Date(dto.estimatedTime).valueOf() - Date.now()) / (1000 * 60),
   )
 
   function DepartureTimeString(): string {
