@@ -182,7 +182,7 @@ watch(refreshTick, () => {
 }
 
 .fav-btn:hover {
-  color: #f9e547;
+  color: #f3e891;
   transform: scale(1.2);
 }
 
@@ -272,35 +272,30 @@ watch(refreshTick, () => {
 .panel-header-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex-shrink: 0;
 }
 
-.panel-fav-btn {
-  font-size: 19px;
-  padding: 2px 4px;
-}
-
-.panel-refresh {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 19px;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 4px;
+.panel-fav-btn,
+.panel-refresh,
+.panel-close {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   line-height: 1;
-  transition:
-    color 0.15s,
-    transform 0.15s;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .panel-refresh:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .panel-refresh.spinning {
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.4s linear infinite;
 }
 
 @keyframes spin {
@@ -310,21 +305,6 @@ watch(refreshTick, () => {
   to {
     transform: rotate(360deg);
   }
-}
-
-.panel-close {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 17px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition:
-    color 0.15s,
-    background 0.15s;
-  flex-shrink: 0;
 }
 
 .panel-close:hover {
