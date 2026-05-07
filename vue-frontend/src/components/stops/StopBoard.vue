@@ -34,7 +34,7 @@
           v-if="canClose"
           class="panel-close"
           title="Zamknij"
-          @click="$emit('close')"
+          @click="emit('close')"
         >
           ✕
         </button>
@@ -107,13 +107,13 @@
         </span>
         <span class="dep-headsign">{{ departure.headsign }}</span>
       </div>
-      <p
+      <button
         v-if="departures.length > MAX_DEPARTURES && sliceDepartures"
         class="dep-more"
-        @click="sliceDepartures = false"
+        @click.stop="(sliceDepartures = false), emit('expanded')"
       >
         + {{ departures.length - MAX_DEPARTURES }} kolejnych odjazdów
-      </p>
+      </button>
     </div>
   </div>
 </template>
@@ -135,8 +135,9 @@ const props = defineProps<{
   canClose?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'close'): void
+  (e: 'expanded'): void
 }>()
 
 const { departures, loading, loadDepartures, clearDepartures } = useDepartures()
@@ -202,6 +203,7 @@ onBeforeUnmount(() => {
   border-radius: 16px;
   overflow: visible;
   flex-shrink: 0;
+  min-width: 300px;
 }
 
 /* Ulubiony panel – lekko inne obramowanie nagłówka */
@@ -236,9 +238,10 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: #f9e547;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
   flex: 1;
+  height: 100%;
 }
 
 .panel-stop-subname {
@@ -262,15 +265,15 @@ onBeforeUnmount(() => {
 }
 
 .panel-fav-btn {
-  font-size: 14px;
+  font-size: 19px;
   padding: 2px 4px;
 }
 
 .panel-refresh {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 15px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 19px;
   cursor: pointer;
   padding: 2px 4px;
   border-radius: 4px;
@@ -281,7 +284,7 @@ onBeforeUnmount(() => {
 }
 
 .panel-refresh:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .panel-refresh.spinning {
@@ -300,8 +303,9 @@ onBeforeUnmount(() => {
 .panel-close {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 17px;
+  line-height: 1;
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -312,8 +316,7 @@ onBeforeUnmount(() => {
 }
 
 .panel-close:hover {
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .panel-loading {
@@ -399,8 +402,8 @@ onBeforeUnmount(() => {
   line-height: 1;
   vertical-align: super;
   position: relative;
-  top: 0em;
-  left: 0.5em;
+  top: -0.3em;
+  left: 0.2em;
 }
 
 .delay-early {
@@ -419,7 +422,8 @@ onBeforeUnmount(() => {
   border-radius: 50%;
   background: #2ecc71;
   position: relative;
-  left: 0.35em;
+  top: -0.2em;
+  left: 0.2em;
 }
 
 .dep-badge {
@@ -450,7 +454,8 @@ onBeforeUnmount(() => {
 }
 
 .dep-more {
-  font-size: 11px;
+  width: 100%;
+  font-size: 11.5px;
   color: rgba(207, 207, 207, 0.421);
   text-align: center;
   padding: 8px 0 5px;
