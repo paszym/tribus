@@ -41,90 +41,98 @@
       </div>
     </div>
 
-    <div v-if="loading" class="panel-loading">Ładowanie...</div>
+    <div v-if="loading && !departures.length" class="panel-loading">
+      Ładowanie...
+    </div>
 
-    <div v-else-if="!departures.length" class="panel-empty">
+    <div v-else-if="!loading && !departures.length" class="panel-empty">
       Brak odjazdów w najbliższym czasie
     </div>
 
-    <div v-else class="dep-list">
-      <div
-        v-for="(departure, i) in sliceDepartures
-          ? departures.slice(0, MAX_DEPARTURES)
-          : departures"
-        :key="i"
-        class="dep-row"
-      >
-        <span class="dep-time-wrap">
-          <span
-            class="dep-time"
-            :class="{
-              'dep-time--now': departure.estimatedTimeString === 'teraz',
-            }"
-          >
-            <transition name="pulse" mode="out-in">
-              <span
-                v-if="departure.estimatedTimeString === 'teraz'"
-                class="dep-time--now"
-                :class="{ 'dep-time--dim': !showEstimated }"
-              >
-                teraz
-              </span>
-              <span v-else :key="showEstimated ? 'str' : 'time'">
-                {{
-                  showEstimated
-                    ? departure.estimatedTimeString
-                    : departure.estimatedTime
-                }}
-              </span>
-            </transition>
-          </span>
-          <sup
-            v-if="Math.floor(Math.abs(departure.delaySeconds) / 60) !== 0"
-            :title="
-              departure.delaySeconds < 0
-                ? `Przyspieszenie ${Math.floor(Math.abs(departure.delaySeconds) / 60)} min`
-                : `Opóźnienie ${Math.floor(departure.delaySeconds / 60)} min`
-            "
-            class="dep-delay"
-            :class="{
-              'delay-early': departure.delaySeconds < 0,
-              'delay-ok':
-                departure.delaySeconds > 0 && departure.delaySeconds <= 300,
-              'delay-late': departure.delaySeconds > 300,
-            }"
-          >
-            {{ departure.delaySeconds < 0 ? '-' : '+'
-            }}{{ Math.floor(Math.abs(departure.delaySeconds) / 60) }}
-          </sup>
-          <span v-else class="dep-on-time" title="Punktualnie" />
-        </span>
-        <span
-          class="dep-badge"
-          :class="departure.routeId < 100 ? 'tram' : 'bus'"
+    <div v-else class="dep-list-wrap">
+      <transition name="skeleton-fade">
+        <div v-if="loading" class="dep-skeleton-overlay" />
+      </transition>
+
+      <div class="dep-list">
+        <div
+          v-for="(departure, i) in sliceDepartures
+            ? departures.slice(0, MAX_DEPARTURES)
+            : departures"
+          :key="i"
+          class="dep-row"
         >
-          {{ departure.routeName }}
-        </span>
-        <span class="dep-headsign">{{ departure.headsign }}</span>
+          <span class="dep-time-wrap">
+            <span
+              class="dep-time"
+              :class="{
+                'dep-time--now': departure.estimatedTimeString === 'teraz',
+              }"
+            >
+              <transition name="pulse" mode="out-in">
+                <span
+                  v-if="departure.estimatedTimeString === 'teraz'"
+                  class="dep-time--now"
+                  :class="{ 'dep-time--dim': !showEstimated }"
+                >
+                  teraz
+                </span>
+                <span v-else :key="showEstimated ? 'str' : 'time'">
+                  {{
+                    showEstimated
+                      ? departure.estimatedTimeString
+                      : departure.estimatedTime
+                  }}
+                </span>
+              </transition>
+            </span>
+            <sup
+              v-if="Math.floor(Math.abs(departure.delaySeconds) / 60) !== 0"
+              :title="
+                departure.delaySeconds < 0
+                  ? `Przyspieszenie ${Math.floor(Math.abs(departure.delaySeconds) / 60)} min`
+                  : `Opóźnienie ${Math.floor(departure.delaySeconds / 60)} min`
+              "
+              class="dep-delay"
+              :class="{
+                'delay-early': departure.delaySeconds < 0,
+                'delay-ok':
+                  departure.delaySeconds > 0 && departure.delaySeconds <= 300,
+                'delay-late': departure.delaySeconds > 300,
+              }"
+            >
+              {{ departure.delaySeconds < 0 ? '-' : '+'
+              }}{{ Math.floor(Math.abs(departure.delaySeconds) / 60) }}
+            </sup>
+            <span v-else class="dep-on-time" title="Punktualnie" />
+          </span>
+          <span
+            class="dep-badge"
+            :class="departure.routeId < 100 ? 'tram' : 'bus'"
+          >
+            {{ departure.routeName }}
+          </span>
+          <span class="dep-headsign">{{ departure.headsign }}</span>
+        </div>
+        <button
+          v-if="departures.length > MAX_DEPARTURES && sliceDepartures"
+          class="dep-more"
+          @click.stop="(sliceDepartures = false), emit('expanded')"
+        >
+          + {{ departures.length - MAX_DEPARTURES }} kolejnych odjazdów
+        </button>
       </div>
-      <button
-        v-if="departures.length > MAX_DEPARTURES && sliceDepartures"
-        class="dep-more"
-        @click.stop="(sliceDepartures = false), emit('expanded')"
-      >
-        + {{ departures.length - MAX_DEPARTURES }} kolejnych odjazdów
-      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { onMounted, onBeforeUnmount } from 'vue'
 import { useDepartures } from '@/composables/useDepartures'
 import { useFavourites } from '@/composables/useFavourites'
 import { useAuth } from '@/composables/useAuth'
-import { useTimeFlip } from '@/composables/useTimeFlip'
+import { useSynchronization } from '@/composables/useSynchronization'
 import type { Stop } from '@/models/stop'
 
 const MAX_DEPARTURES = 6
@@ -144,7 +152,7 @@ const { departures, loading, loadDepartures, clearDepartures } = useDepartures()
 
 const { toggleFavouriteStop, isFavouriteStop } = useFavourites()
 const { isLoggedIn } = useAuth()
-const { showEstimated } = useTimeFlip()
+const { showEstimated, refreshTick } = useSynchronization()
 
 onMounted(async () => {
   await loadDepartures(props.stop.id)
@@ -152,6 +160,10 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   clearDepartures()
+})
+
+watch(refreshTick, () => {
+  loadDepartures(props.stop.id)
 })
 </script>
 
@@ -335,6 +347,32 @@ onBeforeUnmount(() => {
   font-style: italic;
   text-align: center;
   padding: 20px;
+}
+
+.dep-list-wrap {
+  position: relative;
+}
+
+.dep-skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(6px) brightness(0.7);
+  background: rgba(13, 15, 20, 0.4);
+  border-radius: 0 0 16px 16px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.skeleton-fade-enter-active {
+  transition: opacity 0.6s ease;
+}
+
+.skeleton-fade-leave-active {
+  transition: opacity 1.2s ease-in;
+}
+.skeleton-fade-enter-from,
+.skeleton-fade-leave-to {
+  opacity: 0;
 }
 
 .dep-list {
