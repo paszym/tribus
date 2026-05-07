@@ -96,8 +96,7 @@ import {
   shallowRef,
   computed,
 } from 'vue'
-import { createApp } from 'vue'
-import StopPopup from '@/components/StopPopup.vue'
+import { createApp, nextTick } from 'vue'
 import VehiclePopup from '@/components/VehiclePopup.vue'
 import DemoBanner from '@/components/DemoBanner.vue'
 import { useVehicles } from '@/composables/useVehicles'
@@ -108,6 +107,7 @@ import type { Stop } from '@/models/stop'
 import { useFavourites } from '@/composables/useFavourites'
 import { useMapRefresh } from '@/composables/useMapRefresh'
 import { useAuth } from '@/composables/useAuth'
+import StopBoard from './stops/StopBoard.vue'
 
 const {
   fetchFavourites,
@@ -295,10 +295,28 @@ function createVehicleMarker(vehicle: Vehicle) {
     app.mount(container)
     marker.setPopupContent(container)
     marker.openPopup()
+    nextTick(() => panPopupIntoView(marker))
     marker.once('popupclose', () => app.unmount())
   })
 
   vehicleEntries.set(vehicle.code, { marker, isLite: false })
+}
+
+function panPopupIntoView(marker: L.Marker) {
+  const m = getMap()
+  if (!m) return
+
+  const popupEl = marker.getPopup()?.getElement()
+  if (!popupEl) return
+  const rect = popupEl.getBoundingClientRect()
+  const mapEl = m.getContainer().getBoundingClientRect()
+
+  const popupCenterX = rect.left + rect.width / 2
+  const popupCenterY = rect.top + rect.height / 2
+  const mapCenterX = mapEl.left + mapEl.width / 2
+  const mapCenterY = mapEl.top + mapEl.height / 2
+
+  m.panBy([popupCenterX - mapCenterX, popupCenterY - mapCenterY])
 }
 
 function createStopMarker(stop: Stop) {
@@ -308,10 +326,19 @@ function createStopMarker(stop: Stop) {
 
   marker.on('popupopen', () => {
     const container = document.createElement('div')
-    const app = createApp(StopPopup, { stop })
+    const app = createApp(StopBoard, {
+      stop,
+      'can-close': true,
+      compact: true,
+      onClose: () => marker.closePopup(),
+      onExpanded: () => {
+        nextTick(() => panPopupIntoView(marker))
+      },
+    })
     app.mount(container)
     marker.setPopupContent(container)
     marker.openPopup()
+    nextTick(() => panPopupIntoView(marker))
     marker.once('popupclose', () => app.unmount())
   })
 

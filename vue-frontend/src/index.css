@@ -52,15 +52,7 @@
 }
 
 .leaflet-popup-close-button {
-  color: rgba(255, 255, 255, 0.35) !important;
-  font-size: 18px !important;
-  top: 8px !important;
-  right: 10px !important;
-  z-index: 10;
-}
-
-.leaflet-popup-close-button:hover {
-  color: rgba(255, 255, 255, 0.8) !important;
+  display: none;
 }
 
 /* Vue Toast Notification */

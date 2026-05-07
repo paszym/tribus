@@ -34,116 +34,132 @@
           v-if="canClose"
           class="panel-close"
           title="Zamknij"
-          @click="$emit('close')"
+          @click="emit('close')"
         >
           ✕
         </button>
       </div>
     </div>
 
-    <div v-if="loading" class="panel-loading">Ładowanie...</div>
+    <div v-if="loading && !departures.length" class="panel-loading">
+      Ładowanie...
+    </div>
 
-    <div v-else-if="!departures.length" class="panel-empty">
+    <div v-else-if="!loading && !departures.length" class="panel-empty">
       Brak odjazdów w najbliższym czasie
     </div>
 
-    <div v-else class="dep-list">
-      <div
-        v-for="(departure, i) in sliceDepartures
-          ? departures.slice(0, MAX_DEPARTURES)
-          : departures"
-        :key="i"
-        class="dep-row"
-      >
-        <span class="dep-time-wrap">
-          <span
-            class="dep-time"
-            :class="{
-              'dep-time--now': departure.estimatedTimeString === 'teraz',
-            }"
-          >
-            <transition name="pulse" mode="out-in">
-              <span
-                v-if="departure.estimatedTimeString === 'teraz'"
-                class="dep-time--now"
-                :class="{ 'dep-time--dim': !showEstimated }"
-              >
-                teraz
-              </span>
-              <span v-else :key="showEstimated ? 'str' : 'time'">
-                {{
-                  showEstimated
-                    ? departure.estimatedTimeString
-                    : departure.estimatedTime
-                }}
-              </span>
-            </transition>
-          </span>
-          <sup
-            v-if="Math.floor(Math.abs(departure.delaySeconds) / 60) !== 0"
-            :title="
-              departure.delaySeconds < 0
-                ? `Przyspieszenie ${Math.floor(Math.abs(departure.delaySeconds) / 60)} min`
-                : `Opóźnienie ${Math.floor(departure.delaySeconds / 60)} min`
-            "
-            class="dep-delay"
-            :class="{
-              'delay-early': departure.delaySeconds < 0,
-              'delay-ok':
-                departure.delaySeconds > 0 && departure.delaySeconds <= 300,
-              'delay-late': departure.delaySeconds > 300,
-            }"
-          >
-            {{ departure.delaySeconds < 0 ? '-' : '+'
-            }}{{ Math.floor(Math.abs(departure.delaySeconds) / 60) }}
-          </sup>
-          <span v-else class="dep-on-time" title="Punktualnie" />
-        </span>
-        <span
-          class="dep-badge"
-          :class="departure.routeId < 100 ? 'tram' : 'bus'"
+    <div v-else class="dep-list-wrap">
+      <transition name="skeleton-fade">
+        <div v-if="loading" class="dep-skeleton-overlay" />
+      </transition>
+
+      <div class="dep-list">
+        <div
+          v-for="(departure, i) in sliceDepartures
+            ? departures.slice(0, MAX_DEPARTURES)
+            : departures"
+          :key="i"
+          class="dep-row"
         >
-          {{ departure.routeName }}
-        </span>
-        <span class="dep-headsign">{{ departure.headsign }}</span>
+          <span class="dep-time-wrap">
+            <span
+              class="dep-time"
+              :class="{
+                'dep-time--now': departure.estimatedTimeString === 'teraz',
+              }"
+            >
+              <transition name="pulse" mode="out-in">
+                <span
+                  v-if="departure.estimatedTimeString === 'teraz'"
+                  class="dep-time--now"
+                  :class="{ 'dep-time--dim': !showEstimated }"
+                >
+                  teraz
+                </span>
+                <span v-else :key="showEstimated ? 'str' : 'time'">
+                  {{
+                    showEstimated
+                      ? departure.estimatedTimeString
+                      : departure.estimatedTime
+                  }}
+                </span>
+              </transition>
+            </span>
+            <sup
+              v-if="Math.floor(Math.abs(departure.delaySeconds) / 60) !== 0"
+              :title="
+                departure.delaySeconds < 0
+                  ? `Przyspieszenie ${Math.floor(Math.abs(departure.delaySeconds) / 60)} min`
+                  : `Opóźnienie ${Math.floor(departure.delaySeconds / 60)} min`
+              "
+              class="dep-delay"
+              :class="{
+                'delay-early': departure.delaySeconds < 0,
+                'delay-ok':
+                  departure.delaySeconds > 0 && departure.delaySeconds <= 300,
+                'delay-late': departure.delaySeconds > 300,
+              }"
+            >
+              {{ departure.delaySeconds < 0 ? '-' : '+'
+              }}{{ Math.floor(Math.abs(departure.delaySeconds) / 60) }}
+            </sup>
+            <span v-else class="dep-on-time" title="Punktualnie" />
+          </span>
+          <span
+            class="dep-badge"
+            :class="departure.routeId < 100 ? 'tram' : 'bus'"
+          >
+            {{ departure.routeName }}
+          </span>
+          <span class="dep-headsign">{{ departure.headsign }}</span>
+        </div>
+        <button
+          v-if="departures.length > MAX_DEPARTURES && sliceDepartures"
+          class="dep-more"
+          @click.stop="(sliceDepartures = false), emit('expanded')"
+        >
+          + {{ departures.length - MAX_DEPARTURES }} kolejnych odjazdów
+        </button>
       </div>
-      <p
-        v-if="departures.length > MAX_DEPARTURES && sliceDepartures"
-        class="dep-more"
-        @click="sliceDepartures = false"
-      >
-        + {{ departures.length - MAX_DEPARTURES }} kolejnych odjazdów
-      </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { onMounted, onBeforeUnmount } from 'vue'
 import { useDepartures } from '@/composables/useDepartures'
 import { useFavourites } from '@/composables/useFavourites'
 import { useAuth } from '@/composables/useAuth'
-import { useTimeFlip } from '@/composables/useTimeFlip'
+import { useSynchronization } from '@/composables/useSynchronization'
 import type { Stop } from '@/models/stop'
 
 const MAX_DEPARTURES = 6
 const sliceDepartures = ref(true)
 
-const props = defineProps<{
-  stop: Stop
-  canClose?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    stop: Stop
+    canClose?: boolean
+    compact?: boolean
+  }>(),
+  {
+    canClose: true,
+    compact: false,
+  },
+)
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'close'): void
+  (e: 'expanded'): void
 }>()
 
 const { departures, loading, loadDepartures, clearDepartures } = useDepartures()
 
 const { toggleFavouriteStop, isFavouriteStop } = useFavourites()
 const { isLoggedIn } = useAuth()
-const { showEstimated } = useTimeFlip()
+const { showEstimated, refreshTick } = useSynchronization()
 
 onMounted(async () => {
   await loadDepartures(props.stop.id)
@@ -151,6 +167,10 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   clearDepartures()
+})
+
+watch(refreshTick, () => {
+  loadDepartures(props.stop.id)
 })
 </script>
 
@@ -169,7 +189,7 @@ onBeforeUnmount(() => {
 }
 
 .fav-btn:hover {
-  color: #f9e547;
+  color: #f3e891;
   transform: scale(1.2);
 }
 
@@ -202,6 +222,7 @@ onBeforeUnmount(() => {
   border-radius: 16px;
   overflow: visible;
   flex-shrink: 0;
+  min-width: 300px;
 }
 
 /* Ulubiony panel – lekko inne obramowanie nagłówka */
@@ -236,9 +257,10 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: #f9e547;
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
   flex: 1;
+  height: 100%;
 }
 
 .panel-stop-subname {
@@ -257,35 +279,30 @@ onBeforeUnmount(() => {
 .panel-header-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex-shrink: 0;
 }
 
-.panel-fav-btn {
-  font-size: 14px;
-  padding: 2px 4px;
-}
-
-.panel-refresh {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 15px;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 4px;
+.panel-fav-btn,
+.panel-refresh,
+.panel-close {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   line-height: 1;
-  transition:
-    color 0.15s,
-    transform 0.15s;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .panel-refresh:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .panel-refresh.spinning {
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.4s linear infinite;
 }
 
 @keyframes spin {
@@ -297,23 +314,8 @@ onBeforeUnmount(() => {
   }
 }
 
-.panel-close {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition:
-    color 0.15s,
-    background 0.15s;
-  flex-shrink: 0;
-}
-
 .panel-close:hover {
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .panel-loading {
@@ -334,8 +336,40 @@ onBeforeUnmount(() => {
   padding: 20px;
 }
 
+.dep-list-wrap {
+  position: relative;
+}
+
+.dep-skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(6px) brightness(0.7);
+  background: rgba(13, 15, 20, 0.4);
+  border-radius: 0 0 16px 16px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.skeleton-fade-enter-active {
+  transition: opacity 0.6s ease;
+}
+
+.skeleton-fade-leave-active {
+  transition: opacity 1.2s ease-in;
+}
+.skeleton-fade-enter-from,
+.skeleton-fade-leave-to {
+  opacity: 0;
+}
+
 .dep-list {
   padding: 8px 0;
+}
+
+.dep-list--compact {
+  padding: 8px 0;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .dep-row {
@@ -399,8 +433,8 @@ onBeforeUnmount(() => {
   line-height: 1;
   vertical-align: super;
   position: relative;
-  top: 0em;
-  left: 0.5em;
+  top: -0.3em;
+  left: 0.2em;
 }
 
 .delay-early {
@@ -419,7 +453,8 @@ onBeforeUnmount(() => {
   border-radius: 50%;
   background: #2ecc71;
   position: relative;
-  left: 0.35em;
+  top: -0.2em;
+  left: 0.2em;
 }
 
 .dep-badge {
@@ -450,7 +485,8 @@ onBeforeUnmount(() => {
 }
 
 .dep-more {
-  font-size: 11px;
+  width: 100%;
+  font-size: 11.5px;
   color: rgba(207, 207, 207, 0.421);
   text-align: center;
   padding: 8px 0 5px;

@@ -8,10 +8,9 @@ export function useDepartures() {
   const error = ref<string | null>(null)
 
   async function loadDepartures(stopId: number, reloadVisible = false) {
-    const MIN_LOADING_MS = 500
+    const MIN_LOADING_MS = 600
     loading.value = true
     error.value = null
-    departures.value = []
     const start = Date.now()
     try {
       departures.value = await departureService.getDepartures(stopId)
