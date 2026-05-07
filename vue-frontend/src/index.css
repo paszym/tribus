@@ -135,3 +135,12 @@
   height: 2px !important;
   border-radius: 0 0 12px 12px !important;
 }
+
+* {
+  user-select: none;
+}
+
+input,
+textarea {
+  user-select: text;
+}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import StopsComponent from '@/components/StopsComponent.vue'
+import DeparturesBoard from '@/components/stops/DeparturesBoard.vue'
 </script>
 
 <template>
-  <StopsComponent />
+  <DeparturesBoard />
 </template>

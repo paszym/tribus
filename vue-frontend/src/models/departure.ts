@@ -3,9 +3,9 @@ export interface Departure {
   routeId: number
   routeName: string
   headsign: string
-  estimatedTime: Date
+  estimatedTime: string
   theoreticalTime: Date
-  delaySeconds: number | null
+  delaySeconds: number
   status: 'REALTIME' | 'SCHEDULED'
   vehicleId: number | null
   vehicleCode: number | null
