@@ -108,6 +108,7 @@ import { useFavourites } from '@/composables/useFavourites'
 import { useMapRefresh } from '@/composables/useMapRefresh'
 import { useAuth } from '@/composables/useAuth'
 import StopBoard from './stops/StopBoard.vue'
+import router from '@/router'
 
 const {
   fetchFavourites,
@@ -171,6 +172,22 @@ const GEOFENCE = {
   maxLon: 18.989575,
 } as const
 
+function updateUrl() {
+  const m = getMap()
+  if (!m) return
+  console.log('Updating URL with map center and zoom')
+
+  const center = m.getCenter()
+  const zoom = m.getZoom()
+  router.replace({
+    query: {
+      lat: center.lat.toFixed(6),
+      lng: center.lng.toFixed(6),
+      z: zoom.toString(),
+    },
+  })
+}
+
 function isPositionValid(lat: number, lon: number): boolean {
   return (
     lat >= GEOFENCE.minLat &&
@@ -188,6 +205,7 @@ function onMapMove() {
   const m = getMap()
   if (!m) return
 
+  updateUrl()
   const bounds = m.getBounds()
   const zoom = m.getZoom()
 
@@ -368,7 +386,13 @@ async function updateVehiclePositions() {
 }
 
 function initializeMap() {
-  const m = L.map('mapContainer').setView([54.352025, 18.646638], 13)
+  const query = router.currentRoute.value.query
+  const initialLat = parseFloat(query.lat as string) || 54.352025
+  const initialLng = parseFloat(query.lng as string) || 18.646638
+  const initialZoom = parseInt(query.z as string) || 13
+
+  const m = L.map('mapContainer').setView([initialLat, initialLng], initialZoom)
+  updateUrl()
 
   L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution:
@@ -393,6 +417,8 @@ onMounted(async () => {
   })
 
   m.on('moveend zoomend', () => onMapMove())
+  m.on('moveend', updateUrl)
+  m.on('zoomend', updateUrl)
 
   await loadVehicles()
   rebuildVehicleMap()

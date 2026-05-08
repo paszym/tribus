@@ -5,7 +5,7 @@
   >
     <div class="nav-wrapper desktop-nav">
       <nav class="nav-pill">
-        <RouterLink to="/">
+        <RouterLink :to="{ path: '/', query: router.currentRoute.value.query }">
           <div class="nav-brand">
             <img src="./assets/logo.png" alt="TriBus" class="brand-img" />
             <span class="brand-name">TriBus</span>
@@ -13,7 +13,11 @@
         </RouterLink>
         <div class="nav-divider" />
         <div class="nav-links">
-          <RouterLink to="/" class="nav-link" exact-active-class="active">
+          <RouterLink
+            :to="{ path: '/', query: router.currentRoute.value.query }"
+            class="nav-link"
+            exact-active-class="active"
+          >
             Mapa na żywo
           </RouterLink>
           <RouterLink to="/stops" class="nav-link" exact-active-class="active">
@@ -221,6 +225,7 @@
 <script setup lang="ts">
 import { Analytics } from '@vercel/analytics/vue'
 import { useAuth } from '@/composables/useAuth'
+import router from './router'
 
 const { isLoggedIn, username, logout } = useAuth()
 </script>
