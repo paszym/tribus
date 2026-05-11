@@ -58,7 +58,7 @@ export function useIcons() {
         display: inline-flex; align-items: center; gap: 4px;
         padding: 3px 6px 3px 5px; background: ${colors.bg};
         border: 1.5px solid ${colors.border}; border-radius: 10px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.25); white-space: nowrap;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.25); white-space: nowrap; opacity: 0.9
       ">
         <svg viewBox="${isTram ? '0 0 80.33 122.88' : '0 0 122.88 120.96'}"
           xmlns="http://www.w3.org/2000/svg"

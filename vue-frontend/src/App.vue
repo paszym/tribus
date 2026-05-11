@@ -3,6 +3,7 @@
   <div
     style="width: 100%; height: 100vh; display: flex; flex-direction: column"
   >
+    <!-- DESKTOP NAV -->
     <div class="nav-wrapper desktop-nav">
       <nav class="nav-pill">
         <RouterLink :to="{ path: '/', query: router.currentRoute.value.query }">
@@ -36,10 +37,59 @@
           <RouterLink v-else to="/login" class="nav-btn primary">
             Zaloguj się
           </RouterLink>
+          <div class="nav-divider" />
+          <!-- THEME TOGGLE DESKTOP -->
+          <button
+            class="theme-toggle"
+            :aria-label="isDark ? 'Włącz tryb jasny' : 'Włącz tryb ciemny'"
+            @click="toggleTheme"
+          >
+            <!-- Sun -->
+            <svg
+              v-if="isDark"
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="4"
+                stroke="currentColor"
+                stroke-width="1.8"
+              />
+              <path
+                d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <!-- Moon -->
+            <svg
+              v-else
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
       </nav>
     </div>
 
+    <!-- MOBILE NAV -->
     <div class="mobile-nav">
       <RouterLink to="/">
         <div class="mobile-brand-pill">
@@ -148,19 +198,51 @@
           </svg>
         </RouterLink>
 
+        <!-- THEME TOGGLE MOBILE -->
+        <button
+          :aria-label="isDark ? 'Tryb jasny' : 'Tryb ciemny'"
+          class="mobile-icon-pill"
+          @click="toggleTheme"
+        >
+          <svg
+            v-if="isDark"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="4"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
         <template v-if="isLoggedIn">
           <button
             class="mobile-icon-pill"
             aria-label="Wyloguj"
             @click="logout()"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path
                 d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
                 stroke="currentColor"
@@ -186,20 +268,13 @@
             </svg>
           </button>
         </template>
-
         <RouterLink
           v-else
           to="/login"
           class="mobile-icon-pill"
           aria-label="Zaloguj się"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path
               d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
               stroke="currentColor"
@@ -225,9 +300,11 @@
 <script setup lang="ts">
 import { Analytics } from '@vercel/analytics/vue'
 import { useAuth } from '@/composables/useAuth'
+import { useTheme } from '@/composables/useTheme'
 import router from './router'
 
 const { isLoggedIn, username, logout } = useAuth()
+const { isDark, toggleTheme } = useTheme()
 </script>
 
 <style>
@@ -241,9 +318,14 @@ const { isLoggedIn, username, logout } = useAuth()
 
 body {
   font-family: 'DM Sans', sans-serif;
+  background: var(--body-bg);
+  color: var(--body-color);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
 }
 
-/* DESKTOP */
+/* ── DESKTOP NAV ── */
 
 .nav-wrapper {
   position: fixed;
@@ -260,18 +342,22 @@ body {
   align-items: center;
   gap: 4px;
   padding: 6px 8px;
-  background: rgba(13, 15, 20, 0.88);
+  background: var(--nav-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: var(--border);
   border-radius: 40px;
   box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.4),
+    var(--nav-shadow),
     0 1px 0 rgba(255, 255, 255, 0.05) inset;
   white-space: nowrap;
   max-width: 95vw;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .nav-brand {
@@ -291,16 +377,18 @@ body {
   font-family: 'Space Mono', monospace;
   font-size: 13px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--brand-name);
   letter-spacing: 0.03em;
+  transition: color 0.25s ease;
 }
 
 .nav-divider {
   width: 1px;
   height: 18px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--nav-divider);
   margin: 0 2px;
   flex-shrink: 0;
+  transition: background 0.25s ease;
 }
 
 .nav-links {
@@ -315,7 +403,7 @@ body {
   padding: 5px 12px;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--nav-text);
   text-decoration: none;
   border-radius: 30px;
   transition:
@@ -324,13 +412,13 @@ body {
 }
 
 .nav-link:hover {
-  color: rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--nav-text-hover);
+  background: var(--nav-hover-bg);
 }
 
 .nav-link.active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--nav-text-active);
+  background: var(--nav-active-bg);
 }
 
 .nav-right {
@@ -346,8 +434,9 @@ body {
   gap: 5px;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--user-badge);
   padding: 4px 10px;
+  transition: color 0.25s ease;
 }
 
 .user-dot {
@@ -376,9 +465,9 @@ body {
   font-weight: 500;
   padding: 5px 13px;
   border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--nav-btn-border);
   background: transparent;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--nav-btn-color);
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -388,8 +477,8 @@ body {
 }
 
 .nav-btn:hover {
-  color: rgba(255, 255, 255, 0.85);
-  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--nav-btn-hover);
+  border-color: var(--nav-btn-hover-border);
 }
 
 .nav-btn.primary {
@@ -403,7 +492,34 @@ body {
   border-color: #21618c;
 }
 
-/* MOBILE */
+/* THEME TOGGLE */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--nav-btn-border);
+  background: transparent;
+  color: var(--nav-btn-color);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s;
+}
+
+.theme-toggle:hover {
+  color: var(--nav-btn-hover);
+  border-color: var(--nav-btn-hover-border);
+  background: var(--nav-hover-bg);
+}
+
+/* ── MOBILE NAV ── */
 
 .mobile-nav {
   display: none;
@@ -424,12 +540,15 @@ body {
   align-items: center;
   gap: 7px;
   padding: 7px 13px 7px 9px;
-  background: rgba(13, 15, 20, 0.88);
+  background: var(--nav-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--nav-border);
   border-radius: 40px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--nav-shadow);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .mobile-icons {
@@ -446,18 +565,18 @@ body {
   pointer-events: all;
   width: 42px;
   height: 42px;
-  background: rgba(13, 15, 20, 0.88);
+  background: var(--nav-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--nav-border);
   border-radius: 50%;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--nav-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--nav-text);
   text-decoration: none;
   transition:
     background 0.18s,
@@ -466,15 +585,15 @@ body {
 }
 
 .mobile-icon-pill:hover {
-  background: rgba(30, 35, 45, 0.95);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--nav-hover-bg);
+  border-color: var(--nav-btn-hover-border);
+  color: var(--nav-text-hover);
 }
 
 .mobile-icon-pill.active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--nav-text-active);
+  background: var(--nav-active-bg);
+  border-color: var(--nav-btn-hover-border);
 }
 
 @media (max-width: 900px) {

@@ -109,6 +109,7 @@ import { useMapRefresh } from '@/composables/useMapRefresh'
 import { useAuth } from '@/composables/useAuth'
 import StopBoard from './stops/StopBoard.vue'
 import router from '@/router'
+import { useTheme } from '@/composables/useTheme'
 
 const {
   fetchFavourites,
@@ -132,6 +133,7 @@ const {
   isSyncing,
 } = useMapRefresh(updateVehiclePositions)
 const { isLoggedIn } = useAuth()
+const { isDark } = useTheme()
 const favOpen = ref(false)
 
 const vehiclesHasError = computed(() => vehiclesError.value !== null)
@@ -390,14 +392,62 @@ function initializeMap() {
   const initialLat = parseFloat(query.lat as string) || 54.352025
   const initialLng = parseFloat(query.lng as string) || 18.646638
   const initialZoom = parseInt(query.z as string) || 13
+  /*
+'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png'
+
+'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+
+  */
+
+  const mapUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+
+  const tiles = {
+    dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+    light:
+      'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+  }
 
   const m = L.map('mapContainer').setView([initialLat, initialLng], initialZoom)
   updateUrl()
 
-  L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution:
-      '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+  const attribution = '&copy; <a href="https://carto.com/">CARTO</a>'
+
+  let tileLayer = L.tileLayer(isDark.value ? tiles.dark : tiles.light, {
+    attribution,
   }).addTo(m)
+
+  watch(isDark, (dark) => {
+    const newTileLayer = L.tileLayer(dark ? tiles.dark : tiles.light, {
+      attribution,
+      opacity: 0,
+    }).addTo(m)
+
+    // Nowa warstwa pod spodem się ładuje, stara zostaje widoczna
+    const startTime = performance.now()
+    const duration = 600
+
+    function animate() {
+      const progress = Math.min((performance.now() - startTime) / duration, 1)
+      // ease-in-out
+      const eased =
+        progress < 0.5
+          ? 2 * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 2) / 2
+
+      newTileLayer.setOpacity(eased)
+      tileLayer.setOpacity(1 - eased)
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      } else {
+        tileLayer.remove()
+        tileLayer = newTileLayer
+      }
+    }
+
+    requestAnimationFrame(animate)
+  })
 
   vehicleLayer.addTo(m)
   stopLayer.addTo(m)
@@ -463,10 +513,10 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   padding: 6px 13px;
-  background: rgba(13, 15, 20, 0.88);
+  background: var(--nav-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: var(--border);
   border-radius: 40px;
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.4),
@@ -498,10 +548,9 @@ onBeforeUnmount(() => {
 }
 
 .hud-text {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
-  font-family: 'Space Mono', monospace;
+  color: var(--nav-text);
   letter-spacing: 0.02em;
 }
 
@@ -652,12 +701,15 @@ onBeforeUnmount(() => {
 
 /* Legenda */
 .legend-hud {
-  bottom: 28px;
+  bottom: 14px;
   left: 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 10px 13px;
+  background-color: var(--nav-bg);
+  cursor: default;
+  border: var(--border);
 }
 
 .legend-item {
@@ -687,7 +739,7 @@ onBeforeUnmount(() => {
 .legend-text {
   font-size: 11px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--nav-text);
 }
 
 @media (max-width: 900px) {
