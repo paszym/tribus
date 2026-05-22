@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "es2022",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    "rootDir": "src",
+    "outDir": "./dist",
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "noUnusedLocals": false, // avoid double warnings with @typescript-eslint/no-unused-vars
+    "noUnusedParameters": false, // avoid double warnings with @typescript-eslint/no-unused-vars
+    "forceConsistentCasingInFileNames": true,
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

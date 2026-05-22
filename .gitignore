@@ -1,6 +1,6 @@
 vue-frontend/node_modules/
 express-backend/node_modules/
-database/
+/database/
 
 vue-frontend/dist/
 
