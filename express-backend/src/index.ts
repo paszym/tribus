@@ -17,9 +17,6 @@ import { errorHandler } from '@/shared/errors/errorHandler';
 
 import ztmRoutes from '@/interface/routes/ztmRoutes';
 
-// ---------------------------------------------------------------------------
-// Konfiguracja CORS
-// ---------------------------------------------------------------------------
 const isDev = env.nodeEnv !== 'production';
 const BASE_URL = isDev ? `http://localhost:${env.port}` : (env.baseUrl ?? '');
 const allowedOrigins = isDev ? ['http://localhost:5173'] : ['https://tribus-alpha.vercel.app'];
@@ -107,9 +104,6 @@ async function bootstrap(): Promise<void> {
   `);
   });
 
-  // ---------------------------------------------------------------------------
-  // Swagger
-  // ---------------------------------------------------------------------------
   const swaggerOptions: swaggerJsDoc.Options = {
     definition: {
       openapi: '3.0.0',

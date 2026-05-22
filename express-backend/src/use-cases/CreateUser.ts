@@ -27,7 +27,6 @@ export class CreateUser {
       favourites: { stops: [], lines: [], vehicles: [] },
     };
 
-    // EmailAlreadyExistsError może polecieć z repozytorium — bubluje wyżej
     return this.userRepository.create(user);
   }
 }

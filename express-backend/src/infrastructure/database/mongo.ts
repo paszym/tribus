@@ -17,7 +17,7 @@ export async function connectMongo(): Promise<Db | undefined> {
     client = new MongoClient(mongoUrl);
     await client.connect();
     db = client.db();
-    console.info(`MongoDB connected (${process.env.NODE_ENV})`);
+    console.info(`[MongoDB] Connected (${process.env.NODE_ENV})`);
     return db;
   } catch (error) {
     if (error instanceof MongoError) {
@@ -26,11 +26,6 @@ export async function connectMongo(): Promise<Db | undefined> {
     client = null;
     return undefined;
   }
-}
-
-export function getDb(): Db {
-  if (!db) throw new MongoError('Database not initialized');
-  return db;
 }
 
 export async function closeMongo(): Promise<void> {
