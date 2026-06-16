@@ -32,9 +32,14 @@
               <span class="user-dot" />
               {{ username }}
             </span>
-            <button class="nav-btn" @click="logout()">Wyloguj</button>
+            <button class="nav-link" @click="logout()">Wyloguj</button>
           </template>
-          <RouterLink v-else to="/login" class="nav-btn primary">
+          <RouterLink
+            v-else
+            to="/login"
+            class="nav-link"
+            exact-active-class="active"
+          >
             Zaloguj się
           </RouterLink>
           <div class="nav-divider" />
@@ -239,6 +244,7 @@
         <template v-if="isLoggedIn">
           <button
             class="mobile-icon-pill"
+            exact-active-class="active"
             aria-label="Wyloguj"
             @click="logout()"
           >
@@ -272,6 +278,7 @@
           v-else
           to="/login"
           class="mobile-icon-pill"
+          exact-active-class="active"
           aria-label="Zaloguj się"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -319,7 +326,7 @@ const { isDark, toggleTheme } = useTheme()
 body {
   font-family: 'DM Sans', sans-serif;
   background: var(--body-bg);
-  color: var(--body-color);
+  color: #111111;
   transition:
     background 0.25s ease,
     color 0.25s ease;
@@ -329,7 +336,7 @@ body {
 
 .nav-wrapper {
   position: fixed;
-  top: 16px;
+  top: 1.5vh;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2000;
@@ -377,7 +384,7 @@ body {
   font-family: 'Space Mono', monospace;
   font-size: 13px;
   font-weight: 700;
-  color: var(--brand-name);
+  color: #ffffff;
   letter-spacing: 0.03em;
   transition: color 0.25s ease;
 }
@@ -385,7 +392,7 @@ body {
 .nav-divider {
   width: 1px;
   height: 18px;
-  background: var(--nav-divider);
+  background: rgba(255, 255, 255, 0.1);
   margin: 0 2px;
   flex-shrink: 0;
   transition: background 0.25s ease;
@@ -412,12 +419,12 @@ body {
 }
 
 .nav-link:hover {
-  color: var(--nav-text-hover);
+  color: var(--nav-text-light);
   background: var(--nav-hover-bg);
 }
 
 .nav-link.active {
-  color: var(--nav-text-active);
+  color: var(--nav-text);
   background: var(--nav-active-bg);
 }
 
@@ -434,7 +441,7 @@ body {
   gap: 5px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--user-badge);
+  color: var(--nav-text);
   padding: 4px 10px;
   transition: color 0.25s ease;
 }
@@ -465,9 +472,8 @@ body {
   font-weight: 500;
   padding: 5px 13px;
   border-radius: 30px;
-  border: 1px solid var(--nav-btn-border);
   background: transparent;
-  color: var(--nav-btn-color);
+  color: var(--nav-text);
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -501,9 +507,9 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 1px solid var(--nav-btn-border);
+  border: 1px solid var(--nav-text-lighter);
   background: transparent;
-  color: var(--nav-btn-color);
+  color: var(--nav-text);
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
@@ -587,11 +593,11 @@ body {
 .mobile-icon-pill:hover {
   background: var(--nav-hover-bg);
   border-color: var(--nav-btn-hover-border);
-  color: var(--nav-text-hover);
+  color: var(--nav-text-light);
 }
 
 .mobile-icon-pill.active {
-  color: var(--nav-text-active);
+  color: var(--nav-text);
   background: var(--nav-active-bg);
   border-color: var(--nav-btn-hover-border);
 }

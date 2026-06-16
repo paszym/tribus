@@ -157,7 +157,7 @@ onMounted(async () => {
 .bg-map {
   position: absolute;
   inset: 0;
-  background: #1a1e2a;
+  background: var(--body-bg);
 }
 
 .search-overlay {
@@ -179,7 +179,7 @@ onMounted(async () => {
   z-index: 1000;
   overflow-y: auto;
   scrollbar-width: auto;
-  scrollbar-color: rgba(249, 229, 71, 0.25) transparent;
+  scrollbar-color: var(--stop-color) transparent;
 }
 
 .ui-panel::-webkit-scrollbar {
@@ -196,7 +196,7 @@ onMounted(async () => {
 }
 
 .ui-panel::-webkit-scrollbar-thumb:hover {
-  background: rgba(249, 229, 71, 0.55);
+  background: var(--stop-color);
 }
 
 /* ── Search pill ── */
@@ -209,8 +209,8 @@ onMounted(async () => {
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  background: rgba(13, 15, 20, 0.9);
-  border-radius: 40px;
+  background: var(--nav-bg);
+  border-radius: var(--border-radius);
 }
 
 .search-pill:focus-within {
@@ -220,7 +220,7 @@ onMounted(async () => {
 .search-icon {
   width: 16px;
   height: 16px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--nav-text);
   flex-shrink: 0;
 }
 
@@ -233,16 +233,16 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 400;
   color: #fff;
-  caret-color: #1a5276;
+  caret-color: var(--nav-text);
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--nav-text);
 }
 
 .search-clear {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--nav-text);
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 20px;
@@ -252,15 +252,15 @@ onMounted(async () => {
 }
 
 .search-clear:hover {
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--nav-text-light);
+  background: var(--nav-hover-bg);
 }
 
 /* ── Dropdown ── */
 .results-dropdown {
   margin-top: 6px;
-  background: rgba(13, 15, 20, 0.94);
-  border-radius: 16px;
+  background: var(--nav-bg);
+  border-radius: var(--border-radius);
   overflow: hidden;
 }
 
@@ -353,7 +353,7 @@ onMounted(async () => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-on-bg);
   padding: 4px 4px 0;
 }
 
@@ -362,7 +362,7 @@ onMounted(async () => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: rgba(255, 255, 255, 0.473);
+  color: var(--text-on-bg);
   padding: 4px 4px 0;
   text-align: center;
 }

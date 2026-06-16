@@ -1,6 +1,22 @@
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 
-const isDark = ref(true)
+function initTheme(): boolean {
+  const saved = localStorage.getItem('theme')
+
+  if (saved !== null) {
+    return saved === 'dark'
+  }
+
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  localStorage.setItem('theme', prefersDark ? 'dark' : 'light')
+  return prefersDark
+}
+
+const isDark = ref(initTheme())
+document.documentElement.setAttribute(
+  'data-theme',
+  isDark.value ? 'dark' : 'light',
+)
 
 export function useTheme() {
   function applyTheme(dark: boolean) {
@@ -12,15 +28,6 @@ export function useTheme() {
     localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
     applyTheme(isDark.value)
   }
-
-  onMounted(() => {
-    const saved = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches
-    isDark.value = saved ? saved === 'dark' : prefersDark
-    applyTheme(isDark.value)
-  })
 
   return { isDark, toggleTheme }
 }

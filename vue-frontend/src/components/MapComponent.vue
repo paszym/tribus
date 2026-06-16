@@ -159,10 +159,9 @@ const stopEntries = new Map<Stop, StopEntry>()
 const vehicleLayer = L.layerGroup()
 const stopLayer = L.layerGroup()
 
-const MAX_VISIBLE_VEHICLES = 40
-const MAX_VISIBLE_STOPS_FULL = 20
-const MAX_VISIBLE_STOPS_SIMPLIFIED = 40
-const MIN_ZOOM_STOPS = 13
+const MIN_ZOOM_LIGHT_STOPS = 16
+const MIN_ZOOM_FULL_STOPS = 17
+const MAX_VISIBLE_VEHICLES = 30
 
 watch([onlyStops, onlyLines, onlyVehicles], () => onMapMove())
 
@@ -254,34 +253,14 @@ function onMapMove() {
 
   // stops
 
-  const zoomOk = zoom > MIN_ZOOM_STOPS
-
-  let visibleStopCount = 0
-  if (zoomOk) {
-    for (const [stop, _entry] of stopEntries) {
-      if (
-        bounds.contains([stop.lat, stop.lon]) &&
-        (!onlyStops.value || isFavouriteStop(stop.id))
-      ) {
-        visibleStopCount++
-      }
-    }
-  }
-
-  const showFull = zoomOk && visibleStopCount < MAX_VISIBLE_STOPS_FULL
-  const showSimplified =
-    zoomOk && visibleStopCount < MAX_VISIBLE_STOPS_SIMPLIFIED
+  const showFull = zoom >= MIN_ZOOM_FULL_STOPS
+  const showSimplified = zoom >= MIN_ZOOM_LIGHT_STOPS
 
   for (const [stop, entry] of stopEntries) {
     const inBounds = bounds.contains([stop.lat, stop.lon])
     const passesFilter = !onlyStops.value || isFavouriteStop(stop.id)
 
-    if (
-      !zoomOk ||
-      !inBounds ||
-      !passesFilter ||
-      (!showFull && !showSimplified)
-    ) {
+    if (!inBounds || !passesFilter || (!showFull && !showSimplified)) {
       stopLayer.removeLayer(entry.marker)
       continue
     }
@@ -307,11 +286,15 @@ function createVehicleMarker(vehicle: Vehicle) {
 
   const marker = L.marker([vehicle.lat, vehicle.lon], {
     icon: getVehicleIcon(vehicle),
+    pane: 'markerPane',
   }).bindPopup('Ładowanie...', { minWidth: 250 })
 
   marker.on('popupopen', () => {
     const container = document.createElement('div')
-    const app = createApp(VehiclePopup, { vehicle })
+    const app = createApp(VehiclePopup, {
+      vehicle,
+      onClose: () => marker.closePopup(),
+    })
     app.mount(container)
     marker.setPopupContent(container)
     marker.openPopup()
@@ -342,6 +325,7 @@ function panPopupIntoView(marker: L.Marker) {
 function createStopMarker(stop: Stop) {
   const marker = L.marker([stop.lat, stop.lon], {
     icon: stopIcon,
+    pane: 'stopsPane',
   }).bindPopup('Ładowanie...')
 
   marker.on('popupopen', () => {
@@ -392,15 +376,6 @@ function initializeMap() {
   const initialLat = parseFloat(query.lat as string) || 54.352025
   const initialLng = parseFloat(query.lng as string) || 18.646638
   const initialZoom = parseInt(query.z as string) || 13
-  /*
-'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png'
-
-'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-
-  */
-
-  const mapUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
 
   const tiles = {
     dark: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
@@ -411,7 +386,20 @@ function initializeMap() {
   const m = L.map('mapContainer').setView([initialLat, initialLng], initialZoom)
   updateUrl()
 
-  const attribution = '&copy; <a href="https://carto.com/">CARTO</a>'
+  m.createPane('stopsPane')
+  const stopsPane = m.getPane('stopsPane')
+  if (stopsPane) {
+    stopsPane.style.zIndex = '200'
+  }
+
+  m.createPane('vehiclesPane')
+  const vehiclesPane = m.getPane('vehiclesPane')
+  if (vehiclesPane) {
+    vehiclesPane.style.zIndex = '300'
+  }
+
+  const attribution =
+    '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
 
   let tileLayer = L.tileLayer(isDark.value ? tiles.dark : tiles.light, {
     attribution,
@@ -420,12 +408,11 @@ function initializeMap() {
   watch(isDark, (dark) => {
     const newTileLayer = L.tileLayer(dark ? tiles.dark : tiles.light, {
       attribution,
-      opacity: 0,
     }).addTo(m)
 
     // Nowa warstwa pod spodem się ładuje, stara zostaje widoczna
     const startTime = performance.now()
-    const duration = 600
+    const duration = 800
 
     function animate() {
       const progress = Math.min((performance.now() - startTime) / duration, 1)
@@ -507,20 +494,21 @@ onBeforeUnmount(() => {
 
 /* Countdown */
 .update-hud {
-  top: 20px;
-  right: 14px;
+  top: 1.5vh;
+  right: 1.5vh;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   padding: 6px 13px;
   background: var(--nav-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: var(--border);
-  border-radius: 40px;
+  border-radius: var(--border-radius);
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.4),
     0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  cursor: default;
 }
 
 .hud-pulse {
@@ -549,9 +537,11 @@ onBeforeUnmount(() => {
 
 .hud-text {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
+  min-width: 22px;
+  text-align: center;
   color: var(--nav-text);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
 }
 
 /* Favourites anchor */
@@ -570,10 +560,7 @@ onBeforeUnmount(() => {
 .fav-pill {
   width: 42px;
   height: 42px;
-  background: rgba(13, 15, 20, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--nav-bg);
   border-radius: 50%;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -592,17 +579,14 @@ onBeforeUnmount(() => {
 
 /* Panel */
 .fav-panel {
-  background: rgba(15, 17, 23, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  background: var(--nav-bg);
+  border-radius: var(--border-radius);
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 190px;
-  color: #fff;
+  color: var(--nav-text);
   font-family: 'DM Sans', sans-serif;
 }
 
@@ -629,7 +613,6 @@ onBeforeUnmount(() => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: rgba(255, 255, 255, 0.3);
   margin-bottom: 4px;
 }
 
@@ -651,7 +634,7 @@ onBeforeUnmount(() => {
 .filter-label {
   font-size: 12px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--nav-text-lighter);
   transition: color 0.2s;
 }
 
@@ -677,7 +660,7 @@ onBeforeUnmount(() => {
 }
 
 .filter-toggle.on .toggle-track {
-  background: #1a5276;
+  background: var(--fav-color);
   border-color: #21618c;
 }
 
@@ -701,8 +684,8 @@ onBeforeUnmount(() => {
 
 /* Legenda */
 .legend-hud {
-  bottom: 14px;
-  left: 14px;
+  bottom: 1.5vh;
+  left: 1.5vh;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -710,6 +693,7 @@ onBeforeUnmount(() => {
   background-color: var(--nav-bg);
   cursor: default;
   border: var(--border);
+  border-radius: var(--border-radius);
 }
 
 .legend-item {
@@ -719,21 +703,20 @@ onBeforeUnmount(() => {
 }
 
 .legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 2px solid white;
 }
 
 .legend-dot.tram {
-  background: #c0392b;
+  background: var(--tram-color);
 }
 .legend-dot.bus {
-  background: #1a5276;
+  background: var(--bus-color);
 }
 .legend-dot.stop {
-  background: #b8860b;
+  background: var(--stop-color);
 }
 
 .legend-text {
