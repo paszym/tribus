@@ -9,7 +9,8 @@ export function useIcons() {
     className: '',
     html: `
       <div style="
-        width: 26px; height: 28px;
+        width: 28px; height: 28px;
+        box-sizing: border-box;
         background: #b9c5df; border: 2px solid #0b204a;
         border-radius: 20%; display: flex; align-items: center;
         justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.3); opacity: 0.83;
@@ -31,9 +32,8 @@ export function useIcons() {
   const stopIconLite = L.divIcon({
     className: '',
     html: `<div style="
-      width: 12px; height: 12px; border-radius: 50%;
-      background: #b8860b; border: 2px solid white;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+      width: 13px; height: 13px; border-radius: 50%;
+      background: var(--stop-color);
     "></div>`,
     iconSize: [10, 10],
     iconAnchor: [5, 5],
@@ -58,7 +58,7 @@ export function useIcons() {
         display: inline-flex; align-items: center; gap: 4px;
         padding: 3px 6px 3px 5px; background: ${colors.bg};
         border: 1.5px solid ${colors.border}; border-radius: 10px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.25); white-space: nowrap;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.25); white-space: nowrap; opacity: 0.95;
       ">
         <svg viewBox="${isTram ? '0 0 80.33 122.88' : '0 0 122.88 120.96'}"
           xmlns="http://www.w3.org/2000/svg"
@@ -92,9 +92,7 @@ export function useIcons() {
       className: '',
       html: `<div style="
         width: 14px; height: 14px; border-radius: 50%;
-        background: ${isTram ? '#cd6155' : '#497896'};
-        border: 0.1px solid white;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+        background: ${isTram ? 'var(--tram-color)' : 'var(--bus-color)'};
       "></div>`,
       iconSize: [10, 10],
       iconAnchor: [5, 5],

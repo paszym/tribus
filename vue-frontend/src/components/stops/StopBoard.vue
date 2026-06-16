@@ -194,7 +194,7 @@ watch(refreshTick, () => {
 }
 
 .fav-btn.starred {
-  color: #f9e547;
+  color: var(--nav-text-light);
 }
 
 /* ── Sekcja ulubionych ── */
@@ -212,23 +212,17 @@ watch(refreshTick, () => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--nav-text-lighter);
   padding: 4px 4px 0;
   text-align: center;
 }
 .departures-panel {
-  width: 99%;
-  background: rgba(13, 15, 20, 0.92);
+  width: 100%;
+  background: var(--nav-bg);
   border-radius: 16px;
   overflow: visible;
   flex-shrink: 0;
   min-width: 300px;
-}
-
-/* Ulubiony panel – lekko inne obramowanie nagłówka */
-.fav-panel .panel-header {
-  border-bottom-color: rgba(249, 229, 71, 0.2);
-  background: rgba(249, 229, 71, 0.05);
 }
 
 .panel-slide-enter-active,
@@ -247,15 +241,14 @@ watch(refreshTick, () => {
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border-bottom: 1px solid rgba(184, 134, 11, 0.3);
-  background: rgba(184, 134, 11, 0.08);
+  background: var(--stop-color);
   border-radius: 16px 16px 0 0;
 }
 
 .panel-stop-name {
   font-size: 14px;
-  font-weight: 600;
-  color: #f9e547;
+  font-weight: 800;
+  color: var(--nav-text-light);
   white-space: nowrap;
   overflow: visible;
   text-overflow: ellipsis;
@@ -264,15 +257,15 @@ watch(refreshTick, () => {
 }
 
 .panel-stop-subname {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  color: #877a14;
+  color: var(--nav-text-light);
   margin: 0 0 0 4px;
   flex: 1;
 }
 
 .panel-stop-name:hover {
-  color: #f9e547cc;
+  color: var(--nav-text-light);
   cursor: pointer;
 }
 
@@ -294,15 +287,15 @@ watch(refreshTick, () => {
   padding: 0;
   line-height: 1;
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--nav-text-lighter);
 }
 
 .panel-refresh:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--nav-text);
 }
 
 .panel-refresh.spinning {
-  animation: spin 0.4s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {
@@ -324,13 +317,13 @@ watch(refreshTick, () => {
   gap: 6px;
   padding: 20px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--nav-text-light);
   font-style: italic;
 }
 
 .panel-empty {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--nav-text-lighter);
   font-style: italic;
   text-align: center;
   padding: 20px;
@@ -394,7 +387,7 @@ watch(refreshTick, () => {
   font-family: 'Space Mono', monospace;
   font-size: 11.7px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--nav-text);
 }
 
 .dep-time--now {
@@ -467,18 +460,18 @@ watch(refreshTick, () => {
 }
 
 .dep-badge.tram {
-  background: rgba(192, 57, 43, 0.25);
-  color: #e88;
+  background: var(--tram-color);
+  color: var(--nav-text);
 }
 
 .dep-badge.bus {
-  background: rgba(26, 82, 118, 0.35);
-  color: #8af;
+  background: var(--bus-color);
+  color: var(--nav-text);
 }
 
 .dep-headsign {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--nav-text-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -487,13 +480,13 @@ watch(refreshTick, () => {
 .dep-more {
   width: 100%;
   font-size: 11.5px;
-  color: rgba(207, 207, 207, 0.421);
+  color: var(--nav-text-lighter);
   text-align: center;
   padding: 8px 0 5px;
   font-style: italic;
 }
 .dep-more:hover {
-  color: rgba(207, 207, 207, 0.7);
+  color: var(--nav-text);
   cursor: pointer;
 }
 </style>

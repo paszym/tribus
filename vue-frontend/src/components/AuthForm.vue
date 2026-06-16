@@ -1,7 +1,6 @@
 <template>
   <div
-    class="flex min-h-full flex-col justify-center px-6 py-10 lg:px-8"
-    style="background: #1a1e2a"
+    class="flex min-h-full flex-col justify-center px-6 py-10 lg:px-8 bg-[var(--body-bg)]"
   >
     <img
       src="@/assets/logo.png"
@@ -9,7 +8,7 @@
       class="mx-auto mb-6 w-20 h-20"
     />
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <h2 class="mt-10 text-center text-2xl font-bold text-gray-300">
+      <h2 class="mt-10 text-center text-2xl font-bold text-[var(--text-on-bg)]">
         {{ title }}
       </h2>
     </div>
@@ -17,7 +16,7 @@
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6" @submit.prevent="handleSubmit">
         <div>
-          <label class="block text-sm font-medium text-gray-300">
+          <label class="block text-sm font-medium text-[var(--text-on-bg)]">
             Adres email
           </label>
           <input
@@ -29,7 +28,9 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-300">Hasło</label>
+          <label class="block text-sm font-medium text-[var(--text-on-bg)]">
+            Hasło
+          </label>
           <input
             v-model="password"
             type="password"
@@ -40,7 +41,7 @@
 
         <button
           type="submit"
-          class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-white"
+          class="flex w-full justify-center rounded-[var(--border-radius)] bg-[var(--nav-bg)] hover:bg-[var(--nav-hover-bg)] px-3 py-1.5 text-white"
         >
           {{ submitLabel }}
         </button>
@@ -48,11 +49,11 @@
 
       <p
         v-if="showRegisterLink"
-        class="mt-10 text-center text-sm text-gray-500"
+        class="mt-10 text-center text-sm text-[var(--text-on-bg)]"
       >
         Nie masz jeszcze konta?
         <RouterLink
-          class="ml-1 text-indigo-600 hover:text-white"
+          class="ml-1 bg-[var(--nav-bg)] hover:bg-[var(--nav-hover-bg)] px-2 py-1.5 text-white rounded-[var(--border-radius)]"
           to="/register"
         >
           Zarejestruj się

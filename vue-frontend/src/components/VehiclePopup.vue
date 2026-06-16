@@ -21,6 +21,9 @@
       <span class="popup-type">
         {{ vehicle.type === 'TRAM' ? 'Tramwaj' : 'Autobus' }}
       </span>
+      <button class="panel-close" title="Zamknij" @click="emit('close')">
+        ✕
+      </button>
     </div>
 
     <div class="popup-body">
@@ -89,15 +92,16 @@ const { isLoggedIn } = useAuth()
 defineProps<{
   vehicle: Vehicle
 }>()
+
+const emit = defineEmits<{
+  (e: 'close'): void
+}>()
 </script>
 
 <style scoped>
 .vehicle-popup {
   font-family: 'DM Sans', system-ui, sans-serif;
   min-width: 220px;
-  background: rgba(13, 15, 20, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -106,20 +110,20 @@ defineProps<{
 .popup-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 12px 14px;
 }
 
 .popup-header.tram {
-  background: rgba(192, 57, 43, 0.18);
+  background: var(--tram-color);
   border-bottom: 1px solid rgba(192, 57, 43, 0.35);
-  color: #e88;
+  color: var(--nav-text);
 }
 
 .popup-header.bus {
-  background: rgba(26, 82, 118, 0.25);
+  background: var(--bus-color);
   border-bottom: 1px solid rgba(26, 82, 118, 0.5);
-  color: #8af;
+  color: var(--nav-text);
 }
 
 .popup-icon {
@@ -133,16 +137,16 @@ defineProps<{
   font-size: 22px;
   font-weight: 700;
   line-height: 1;
-  color: #fff;
+  color: var(--nav-text);
   letter-spacing: -0.01em;
 }
 
 .popup-type {
   font-size: 10px;
   font-weight: 600;
-  opacity: 0.5;
-  margin-left: auto;
-  margin-right: 20px;
+  opacity: 0.8;
+  margin-left: 10px;
+  margin-right: auto;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -153,6 +157,7 @@ defineProps<{
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background: var(--nav-bg);
 }
 
 .popup-row {
@@ -164,7 +169,7 @@ defineProps<{
 }
 
 .popup-label {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--nav-text-lighter);
   white-space: nowrap;
   flex-shrink: 0;
   font-size: 11px;
@@ -178,16 +183,32 @@ defineProps<{
   text-align: right;
 }
 
+.panel-close {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  font-size: 20px;
+  color: var(--nav-text-light);
+}
+
+.panel-close:hover {
+  color: var(--nav-text);
+}
+
 .popup-value.headsign {
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--nav-text);
 }
 
 .popup-value.mono {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  color: var(--nav-text-lighter);
 }
 
 /* Favourites */
@@ -197,6 +218,7 @@ defineProps<{
   display: flex;
   flex-direction: column;
   gap: 7px;
+  background: var(--nav-bg);
 }
 
 .fav-toggle {
@@ -224,7 +246,7 @@ defineProps<{
 }
 
 .fav-track.active {
-  background: #1a5276;
+  background: var(--fav-color);
   border-color: #21618c;
 }
 
@@ -248,6 +270,6 @@ defineProps<{
 
 .fav-label {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--nav-text-lighter);
 }
 </style>

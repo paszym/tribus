@@ -106,7 +106,7 @@ onBeforeUnmount(clearTimer)
   max-width: 460px;
   width: calc(100vw - 40px);
   padding: 28px 24px 24px;
-  background: rgba(13, 15, 20, 0.96);
+  background: var(--nav-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.09);
